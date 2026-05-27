@@ -1,13 +1,22 @@
 import { useEffect, useState, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { CheckoutForm } from  './CheckoutForm'
 import api from '../api/axios'
 import { useCart } from '../contexts/CartContext'
+import type { AxiosError } from 'axios'
 
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+
+type ApiErrorResponse = {
+    message?: string
+}
+
+function getApiErrorMessage(err: unknown): string | undefined {
+    return (err as AxiosError<ApiErrorResponse>).response?.data?.message
+}
 
 export function CheckoutPage() {
     const navigate = useNavigate()
@@ -18,6 +27,39 @@ export function CheckoutPage() {
     const [erroPagamento, setErroPagamento] = useState<string | null>(null)
     const [teste, setTeste] = useState({})
     const effectRan = useRef(false)
+
+    const confirmarPagamento = async (paymentIntentId: string) => {
+        try {
+            const res = await api.post('/payment/confirm', {
+                payment_intent_id: paymentIntentId
+            })
+
+            if(res.data.status === 'pago'){
+                setErroPagamento(null)
+                setSucesso(true)
+                clearCart()
+
+                setTimeout(() => {
+                    navigate('/pedidos')
+                }, 4000)
+
+                return
+            }
+
+            setSucesso(false)
+            setErroPagamento(
+                res.data.message
+                    ?? 'O pagamento ainda não foi confirmado. Confira seu histórico de pedidos antes de tentar pagar novamente.'
+            )
+        } catch (err) {
+            console.error('Erro ao confirmar pagamento', err)
+            setSucesso(false)
+            setErroPagamento(
+                getApiErrorMessage(err)
+                    ?? 'Não foi possível confirmar o pagamento. Confira seu histórico de pedidos antes de tentar pagar novamente.'
+            )
+        }
+    }
 
     useEffect(() => {
         
@@ -34,9 +76,10 @@ export function CheckoutPage() {
                 })
             .catch(err =>{
                 console.error('Erro ao gerar intenção de pagamento', err)
-                const mensagemErro = err.response?.data?.message
+                const mensagemErro = getApiErrorMessage(err)
                     ?? 'Não foi possível concluir o pagamento. Tente novamente em alguns instantes.'
 
+                setSucesso(false)
                 setErroPagamento(mensagemErro)
             })
 
@@ -53,24 +96,30 @@ export function CheckoutPage() {
         }
     }, [cart])
 
-    if(cart.length === 0){
-        return <p className="text-center mt-5"> Seu carrinho está vazio </p> 
-    }
-    
-    if(sucesso){
+    if(sucesso || erroPagamento){
         return(
             <div className="text-center py-5">
-                <h2>Pagamento Realizado com sucesso! 🎉</h2>
-                <p>Redirecionando para seus pedidos...</p>
+                {sucesso && (
+                    <>
+                        <h2>Pagamento Realizado com sucesso! 🎉</h2>
+                        <p>Redirecionando para seus pedidos...</p>
+                    </>
+                )}
+
+                {erroPagamento && (
+                    <>
+                        <h2>Não foi possível concluir o pagamento</h2>
+                        <p>{erroPagamento}</p>
+                        <button className="btn btn-dark mt-3" onClick={() => navigate('/')}>
+                            Voltar para o catálogo
+                        </button>
+                    </>
+                )}
             </div>)
     }
 
-    if(erroPagamento){
-        return(
-            <div className="text-center py-5">
-                <h2>Não foi possível concluir o pagamento</h2>
-                <p>{erroPagamento}</p>
-            </div>)
+    if(cart.length === 0){
+        return <p className="text-center mt-5"> Seu carrinho está vazio </p> 
     }
 
     return (
@@ -78,14 +127,7 @@ export function CheckoutPage() {
             <h2 className="mb-4"> Finalizar compra </h2>
             { clientSecret ? (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                    <CheckoutForm clientSecret={clientSecret} onSuccess={
-                        () => {clearCart()
-                           setSucesso(true)
-                           setTimeout(() => { 
-                            navigate('/pedidos')
-                           }, 2000)
-
-                        }}/>
+                    <CheckoutForm clientSecret={clientSecret} onSuccess={confirmarPagamento}/>
                 </Elements> 
             ):(
                 <div className="text-center"> Carregando checkout... </div>
@@ -93,4 +135,3 @@ export function CheckoutPage() {
         </div>
     )
 }
-

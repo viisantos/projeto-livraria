@@ -3,7 +3,7 @@ import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
 
 interface CheckoutFormProps {
     clientSecret: string;
-    onSuccess: () => void;  
+    onSuccess: (paymentIntentId: string) => Promise<void> | void;  
 }
 
 export function CheckoutForm({ clientSecret, onSuccess }: CheckoutFormProps) {
@@ -17,10 +17,15 @@ export function CheckoutForm({ clientSecret, onSuccess }: CheckoutFormProps) {
         if(!stripe || !elements) return
         
         setProcessando(true)
+        setErro(null)
         
         const cardElement = elements.getElement(CardElement)
         
-        if(!cardElement) return  
+        if(!cardElement) {
+            setErro('Não foi possível carregar o formulário do cartão.')
+            setProcessando(false)
+            return
+        }
 
         const result = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
@@ -33,7 +38,15 @@ export function CheckoutForm({ clientSecret, onSuccess }: CheckoutFormProps) {
             setProcessando(false)
         }else{
             if(result.paymentIntent.status === 'succeeded'){
-                onSuccess()
+                try {
+                    await onSuccess(result.paymentIntent.id)
+                } catch {
+                    setErro('Pagamento recebido, mas não foi possível confirmar o pedido agora.')
+                    setProcessando(false)
+                }
+            }else{
+                setErro('O pagamento ainda não foi concluído. Tente novamente em alguns instantes.')
+                setProcessando(false)
             }
         }
     }

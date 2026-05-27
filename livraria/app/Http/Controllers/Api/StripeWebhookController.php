@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\PedidoRepositoryInterface;
+use App\Services\PagamentoService;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,10 @@ use Stripe\Service\WebhookEndpointService;
 use Stripe\Webhook;
 
 class StripeWebhookController extends Controller{
-    public function __construct(private PedidoRepositoryInterface $pedidoRepository){}
+    public function __construct(
+        private PedidoRepositoryInterface $pedidoRepository,
+        private PagamentoService $pagamentoService
+    ){}
 
     public function handle(Request $request){
         $payload = $request->getContent();
@@ -49,17 +53,7 @@ class StripeWebhookController extends Controller{
                 return;
             }
 
-        DB::transaction(function() use ($pedido) {
-            foreach($pedido->itens as $item){
-                $livro = $item->livro;
-                if($livro->estoque < $item->quantidade){
-                    throw new \Exception("Estoque insuficiente para o livro: ". $livro->titulo);
-                }
-                $livro->decrement('estoque', $item->quantidade);
-            }
-        });
-
-        $this->pedidoRepository->updateStatusByStripeId($paymentIntent->id, 'pago');
+        $this->pagamentoService->registrarPagamentoAprovado($paymentIntent->id);
         Log::info("Pagamento bem-sucedido para Stripe Intent ID: ". $paymentIntent->id);
     }
 

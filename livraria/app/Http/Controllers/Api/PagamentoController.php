@@ -49,4 +49,44 @@ class PagamentoController extends Controller
             ], 500);
         }
     }
+
+    public function confirmarPagamento(Request $request): JsonResponse
+    {
+        $request->validate([
+            'payment_intent_id' => 'required|string',
+        ]);
+
+        try {
+            $resultado = $this->pagamentoService->confirmarPagamento(
+                $request->payment_intent_id,
+                $request->user()->id
+            );
+
+            $httpStatus = match ($resultado['status']) {
+                'pago' => 200,
+                'falha' => 422,
+                default => 202,
+            };
+
+            return response()->json($resultado, $httpStatus);
+        } catch (PaymentGatewayException $e) {
+            Log::warning('Serviço de pagamento indisponível ao confirmar pagamento', [
+                'user_id' => $request->user()->id,
+                'payment_intent_id' => $request->payment_intent_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'code' => 'payment_confirmation_unavailable',
+            ], 503);
+        } catch (\Exception $e) {
+            Log::error('Erro ao confirmar pagamento: '. $e);
+
+            return response()->json([
+                'message' => 'Não foi possível confirmar o pagamento. Verifique seu histórico de pedidos antes de tentar pagar novamente.',
+                'code' => 'payment_confirmation_failed',
+            ], 500);
+        }
+    }
 }

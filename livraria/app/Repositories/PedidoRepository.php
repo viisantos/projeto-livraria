@@ -75,6 +75,6 @@ class PedidoRepository implements PedidoRepositoryInterface{
     }
 
     public function findByStripeId(string $stripePaymentId): ?Pedido {
-        return Pedido::where('stripe_payment_id','=', $stripePaymentId)->with(['items.livro','users'])->first();
+        return Pedido::where('stripe_payment_id','=', $stripePaymentId)->with(['itens.livro','user'])->first();
     }
 }

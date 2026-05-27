@@ -1,8 +1,10 @@
 <?php
 namespace App\Services;
 use App\Exceptions\PaymentGatewayException;
+use App\Models\Pedido;
 use App\Repositories\Contracts\PedidoRepositoryInterface;
 use App\Models\Livro;
+use Illuminate\Support\Facades\DB;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Exception\ApiErrorException;
@@ -62,7 +64,7 @@ class PagamentoService{
                 'preco'          => $livro['price']
             ];
         })->toArray();
-        
+
         $this->pedidoRepository->createPedidoWithItems(
             $userId,
             $total,
@@ -71,5 +73,86 @@ class PagamentoService{
         );
 
         return $intent->client_secret;
+    }
+
+    public function confirmarPagamento(string $paymentIntentId, int $userId): array
+    {
+        try {
+            $intent = PaymentIntent::retrieve($paymentIntentId);
+        } catch (ApiErrorException $e){
+            Log::error('Falha ao consultar PaymentIntent no Stripe', [
+                'user_id' => $userId,
+                'payment_intent_id' => $paymentIntentId,
+                'stripe_error' => $e->getMessage(),
+                'stripe_code' => $e->getStripeCode(),
+            ]);
+
+            throw new PaymentGatewayException(
+                'Não foi possível confirmar o pagamento no momento. Verifique seu histórico de pedidos antes de tentar pagar novamente.',
+                previous: $e
+            );
+        }
+
+        $pedido = $this->pedidoRepository->findByStripeId($paymentIntentId);
+
+        if (!$pedido || $pedido->user_id !== $userId) {
+            throw new \Exception('Pedido não encontrado para este pagamento.');
+        }
+
+        if ($intent->status === 'succeeded') {
+            $this->registrarPagamentoAprovado($paymentIntentId);
+
+            return [
+                'status' => 'pago',
+                'message' => 'Pagamento confirmado com sucesso.',
+            ];
+        }
+
+        if (in_array($intent->status, ['requires_payment_method', 'canceled'], true)) {
+            $this->pedidoRepository->updateStatusByStripeId($paymentIntentId, 'falha');
+
+            return [
+                'status' => 'falha',
+                'message' => 'O pagamento não foi concluído. Confira os dados do cartão e tente novamente.',
+            ];
+        }
+
+        return [
+            'status' => 'pending',
+            'message' => 'O pagamento ainda está sendo processado. Aguarde alguns instantes e confira seu histórico de pedidos.',
+        ];
+    }
+
+    public function registrarPagamentoAprovado(string $paymentIntentId): void
+    {
+        DB::transaction(function () use ($paymentIntentId) {
+            $pedido = Pedido::with('itens.livro')
+                ->where('stripe_payment_id', '=', $paymentIntentId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$pedido) {
+                throw new \Exception('Pedido não encontrado');
+            }
+
+            if ($pedido->status === 'pago') {
+                return;
+            }
+
+            if ($pedido->status !== 'pending') {
+                throw new \Exception('Pedido não está pendente');
+            }
+
+            foreach($pedido->itens as $item){
+                $livro = $item->livro;
+                if($livro->estoque < $item->quantidade){
+                    throw new \Exception("Estoque insuficiente para o livro: ". $livro->titulo);
+                }
+                $livro->decrement('estoque', $item->quantidade);
+            }
+
+            $pedido->status = 'pago';
+            $pedido->save();
+        });
     }
 }
