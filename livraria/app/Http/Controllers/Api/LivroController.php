@@ -23,23 +23,19 @@ class LivroController extends Controller
     public function __construct(
         private LivroService $service
     ){}
-    public function index()
+    public function index(Request $request): JsonResponse
     {
         //Gate::authorize('viewAny', Livro::class);
-        try
-        {
-          $livros = Livro::orderBy('id', 'desc')->with(['autor','categoria'])->paginate(15);
-        } catch (\Exception $e) {
-            Log::info("erro : ". $e);
-        }
-        Log::info("livros : ". response()->json(new LivroCollection($livros)));
+        $livros = $this->service->listarCatalogo($request->query());
+
         return response()->json(new LivroCollection($livros));
     }
 
     public function catalogo(Request $request): JsonResponse
     {
-        $filtros = $request->only(['busca', 'categoria']);
+        $filtros = $request->query();
         $livros = $this->service->listarCatalogo($filtros);
+
         return response()->json(new LivroCollection($livros));
     }
 

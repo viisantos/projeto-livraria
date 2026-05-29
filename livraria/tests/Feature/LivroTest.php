@@ -26,7 +26,7 @@ class LivroTest extends TestCase
 
     private function dadosLivro(int $autorId, int $categoriaId): array {
         return [
-            'titulo'         => 'Introdyção ao Desenvolvimento Web Volume 2',
+            'titulo'         => 'Introdução ao desenvolvimento web volume 2',
             'slug'           => 'introducao-ao-desenvolvimento-web',
             'descricao'      => 'Um livro completo para iniciantes no seu volumne 2',
             'isbn'           => '978-85-99999-00-1',
@@ -36,6 +36,8 @@ class LivroTest extends TestCase
             'sobre'          => 'Aborda HTML, CSS e JavaScript.',
             'autor_id'       => $autorId,
             'categoria_id'   => $categoriaId,
+            'preco'          => 59.90,
+            'estoque'        => 10,
         ];
     }
 
@@ -67,6 +69,128 @@ class LivroTest extends TestCase
     public function test_listagem_falha_sem_autenticacao(){
         $response = $this->getJson('/api/livros');
         $response->assertStatus(401);
+    }
+
+    public function test_comprador_pode_filtrar_catalogo(): void
+    {
+        $auth = $this->loginComoComprador();
+        $categoriaTecnologia = Categoria::factory()->create([
+            'nome' => 'Tecnologia',
+            'slug' => 'tecnologia',
+        ]);
+        $categoriaRomance = Categoria::factory()->create([
+            'nome' => 'Romance',
+            'slug' => 'romance',
+        ]);
+        $autor = Autor::factory()->create(['nome' => 'Robert Martin']);
+
+        $livroEsperado = Livro::factory()->create([
+            'autor_id' => $autor->id,
+            'categoria_id' => $categoriaTecnologia->id,
+            'titulo' => 'Codigo Limpo',
+            'descricao' => 'Boas praticas de desenvolvimento',
+            'preco' => 89.90,
+            'estoque' => 8,
+        ]);
+
+        Livro::factory()->create([
+            'categoria_id' => $categoriaRomance->id,
+            'titulo' => 'Romance Sem Estoque',
+            'preco' => 49.90,
+            'estoque' => 0,
+        ]);
+
+        Livro::factory()->create([
+            'categoria_id' => $categoriaTecnologia->id,
+            'titulo' => 'Livro Muito Caro',
+            'preco' => 180.00,
+            'estoque' => 5,
+        ]);
+
+        $response = $this->getJson(
+            '/api/catalogo?busca=Codigo&categoria=tecnologia&min_preco=50&max_preco=100&disponivel=1',
+            $this->headerComToken($auth['token'])
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $livroEsperado->id);
+    }
+
+    public function test_catalogo_pode_ordenar_por_menor_preco(): void
+    {
+        $auth = $this->loginComoComprador();
+
+        $livroCaro = Livro::factory()->create([
+            'titulo' => 'Livro Caro',
+            'preco' => 120.00,
+            'estoque' => 3,
+        ]);
+        $livroBarato = Livro::factory()->create([
+            'titulo' => 'Livro Barato',
+            'preco' => 25.00,
+            'estoque' => 4,
+        ]);
+
+        $response = $this->getJson(
+            '/api/catalogo?ordenar=preco_menor',
+            $this->headerComToken($auth['token'])
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.id', $livroBarato->id)
+            ->assertJsonPath('data.1.id', $livroCaro->id);
+    }
+
+    public function test_catalogo_busca_livro_e_autor_ignorando_maiusculas_e_minusculas(): void
+    {
+        $auth = $this->loginComoComprador();
+        $autor = Autor::factory()->create(['nome' => 'Robert Martin']);
+
+        $livro = Livro::factory()->create([
+            'autor_id' => $autor->id,
+            'titulo' => 'Codigo Limpo',
+            'descricao' => 'Boas Praticas de Desenvolvimento',
+            'isbn' => 'ISBN-ABC-123',
+        ]);
+
+        Livro::factory()->create([
+            'titulo' => 'Outro Livro',
+            'descricao' => 'Outro assunto',
+            'isbn' => 'ISBN-XYZ-999',
+        ]);
+
+        $this->getJson(
+            '/api/catalogo?busca=codigo',
+            $this->headerComToken($auth['token'])
+        )
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $livro->id);
+
+        $this->getJson(
+            '/api/catalogo?busca=praticas',
+            $this->headerComToken($auth['token'])
+        )
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $livro->id);
+
+        $this->getJson(
+            '/api/catalogo?busca=isbn-abc',
+            $this->headerComToken($auth['token'])
+        )
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $livro->id);
+
+        $this->getJson(
+            '/api/catalogo?autor=robert',
+            $this->headerComToken($auth['token'])
+        )
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $livro->id);
     }
 
     public function test_pode_visualizar_livro_especifico(){

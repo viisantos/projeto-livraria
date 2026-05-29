@@ -19,8 +19,8 @@ class UpdateLivroRequest extends StoreLivroRequest{
             'imagem_capa'    => 'string',
             'sobre'          => 'string',
             'categoria_id'   => 'sometimes|exists:categorias,id',
-            'preco'          => 'required|numeric',
-            'estoque'        => 'integer|min:0'
+            'preco'          => 'sometimes|numeric',
+            'estoque'        => 'sometimes|integer|min:0'
         ];
     }
 }

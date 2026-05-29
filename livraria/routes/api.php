@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function(){
     Route::delete('/me', [UserController::class, 'destroySelf']);
 
     //comprador e admin, ambos podem visuaizar catálogo
+    Route::get('/catalogo', [LivroController::class, 'catalogo']);
     Route::get('/livros', [LivroController::class, 'index']);
     Route::get('/livros/{livro}', [LivroController::class, 'show']);
 

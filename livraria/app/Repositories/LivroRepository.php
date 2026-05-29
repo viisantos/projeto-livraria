@@ -46,16 +46,73 @@ class LivroRepository implements LivroRepositoryInterface{
         $query = Livro::with(['autor','categoria']);
 
         if (!empty($filtros['busca'])) {
-            $query->where('titulo', 'like', '%' . $filtros['busca'] . '%');
-        }
+            $busca = mb_strtolower($filtros['busca']);
 
-        if(!empty($filtros['categoria'])){
-            $query->whereHas('categoria', function($q) use ($filtros) {
-                $q->where('slug', $filtros['categoria']);
+            $query->where(function ($q) use ($busca) {
+                $q->whereRaw('LOWER(titulo) like ?', ['%' . $busca . '%'])
+                    ->orWhereRaw('LOWER(descricao) like ?', ['%' . $busca . '%'])
+                    ->orWhereRaw('LOWER(isbn) like ?', ['%' . $busca . '%'])
+                    ->orWhereHas('autor', function ($autorQuery) use ($busca) {
+                        $autorQuery->whereRaw('LOWER(nome) like ?', ['%' . $busca . '%']);
+                    });
             });
         }
 
+        if (!empty($filtros['categoria_id'])) {
+            $query->where('categoria_id', $filtros['categoria_id']);
+        }
+
+        if (!empty($filtros['categoria'])) {
+            $categoria = $filtros['categoria'];
+
+            $query->whereHas('categoria', function($q) use ($categoria) {
+                $q->where('slug', $categoria)
+                    ->orWhere('nome', 'like', '%' . $categoria . '%');
+            });
+        }
+
+        if (!empty($filtros['autor_id'])) {
+            $query->where('autor_id', $filtros['autor_id']);
+        }
+
+        if (!empty($filtros['autor'])) {
+            $autor = mb_strtolower($filtros['autor']);
+
+            $query->whereHas('autor', function($q) use ($autor) {
+                $q->whereRaw('LOWER(nome) like ?', ['%' . $autor . '%']);
+            });
+        }
+
+        if (isset($filtros['min_preco']) && $filtros['min_preco'] !== '') {
+            $query->where('preco', '>=', $filtros['min_preco']);
+        }
+
+        if (isset($filtros['max_preco']) && $filtros['max_preco'] !== '') {
+            $query->where('preco', '<=', $filtros['max_preco']);
+        }
+
+        if (!empty($filtros['disponivel'])) {
+            $query->where('estoque', '>', 0);
+        }
+
+        $this->aplicarOrdenacao($query, $filtros['ordenar'] ?? null);
+
+        $perPage = (int)($filtros['per_page'] ?? $perPage);
+        $perPage = max(1, min($perPage, 50));
+
         return $query->paginate($perPage);
+     }
+
+     private function aplicarOrdenacao($query, ?string $ordenacao): void
+     {
+        match ($ordenacao) {
+            'titulo_az'   => $query->orderBy('titulo'),
+            'titulo_za'   => $query->orderByDesc('titulo'),
+            'preco_menor' => $query->orderBy('preco'),
+            'preco_maior' => $query->orderByDesc('preco'),
+            'mais_antigos' => $query->orderBy('id'),
+            default => $query->orderByDesc('id'),
+        };
      }
 
 }

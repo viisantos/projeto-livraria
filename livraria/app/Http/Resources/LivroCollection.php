@@ -19,7 +19,7 @@ class LivroCollection extends ResourceCollection
             'meta' => [
                 'total'         => $this->total(),
                 'por_pagina'    => $this->perPage(),
-                'pagina_Atual'  => $this->currentPage(),
+                'pagina_atual'  => $this->currentPage(),
                 'ultima_pagina' => $this->lastPage(),
             ],
         ];
