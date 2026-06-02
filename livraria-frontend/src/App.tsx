@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
+import { FavoritesProvider } from './contexts/FavoritesContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminRoute } from './components/AdminRoute'
 import { Navbar } from './components/Navbar'
@@ -23,6 +24,7 @@ import { EditarAutor } from './pages/Admin/EditarAutor'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { CheckoutSucesso } from './pages/CheckoutSucesso'
 import { Carrinho } from './pages/Carrinho'
+import { Favoritos } from './pages/Favoritos'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { HistoricoPedidos } from './pages/historicoPedidos'
 
@@ -82,6 +84,7 @@ function App() {
     <>
       <AuthProvider>
         <CartProvider>
+        <FavoritesProvider>
           <BrowserRouter>
             <Navbar/>
               <main className="container-fluid px-0">
@@ -107,6 +110,10 @@ function App() {
 
                     <Route path="/carrinho" element={ 
                       <ProtectedRoute><ErrorBoundary><Carrinho/></ErrorBoundary></ProtectedRoute> 
+                    } />
+
+                    <Route path="/favoritos" element={
+                      <ProtectedRoute><Favoritos /></ProtectedRoute>
                     } />
 
                     <Route path="/admin/livros" element={
@@ -159,6 +166,7 @@ function App() {
                 </div>
                 </main>
           </BrowserRouter>
+          </FavoritesProvider>
         </CartProvider>
       </AuthProvider>
     </>
@@ -166,5 +174,4 @@ function App() {
 }
 
 export default App
-
 

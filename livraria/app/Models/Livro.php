@@ -46,6 +46,11 @@ class Livro extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function favoritadoPor(){
+        return $this->belongsToMany(User::class, 'livro_user')
+            ->withTimestamps();
+    }
+
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');

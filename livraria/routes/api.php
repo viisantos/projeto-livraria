@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PagamentoController;
 use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\historicoPedidos;
+use App\Http\Controllers\Api\FavoritoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +80,11 @@ Route::middleware('auth')->group(function(){
     Route::get('/catalogo', [LivroController::class, 'catalogo']);
     Route::get('/livros', [LivroController::class, 'index']);
     Route::get('/livros/{livro}', [LivroController::class, 'show']);
+    Route::get('/me/favoritos', [FavoritoController::class, 'index']);
+    Route::get('/livros/{livro}/favorito', [FavoritoController::class, 'show']);
+    Route::post('/livros/{livro}/favoritar', [FavoritoController::class, 'store']);
+    Route::delete('/livros/{livro}/favoritar', [FavoritoController::class, 'destroy']);
+
 
     Route::apiResource('categorias', CategoriaController::class);
     Route::post('/payment/intent', [PagamentoController::class, 'intencaoPagamento']);
@@ -91,13 +97,10 @@ Route::middleware('auth')->group(function(){
         Route::post('/livros', [LivroController::class, 'store']);
         Route::put('/livros/{livro}', [LivroController::class, 'update']);
         Route::delete('/livros/{livro}', [LivroController::class, 'destroy']);
-
         Route::apiResource('autores', AutorController::class);
-
         Route::apiResource('usuarios', UserController::class);
     });
 });
-
 
 
 Route::middleware('jwt.refresh')->group(function(){

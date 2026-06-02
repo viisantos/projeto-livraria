@@ -55,6 +55,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Livro::class);
     }
 
+    public function favoritos(){
+        return $this->belongsToMany(Livro::class, 'livro_user')
+            ->withTimestamps();
+    }
+
     public function getJWTIdentifier(){
         return $this->getKey();
     }

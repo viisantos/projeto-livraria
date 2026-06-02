@@ -4,6 +4,8 @@ import api from '../api/axios'
 
 import type { Categoria, Livro, PaginatedResponse } from '../types'
 import { useCart } from '../contexts/CartContext'
+import { useFavorites } from '../contexts/FavoritesContext'
+import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa'
 
 type CatalogoFiltros = {
   busca: string
@@ -30,6 +32,7 @@ const filtrosIniciais: CatalogoFiltros = {
 export function Catalogo() {
   const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { isFavorito, toggleFavorito } = useFavorites()
   const [livros, setLivros] = useState<Livro[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [carregando, setCarregando] = useState(true)
@@ -125,6 +128,10 @@ export function Catalogo() {
     addToCart(livro)
     alert('Livro adicionado ao carrinho !')
     navigate('/carrinho')
+  }
+
+  function handleToggleFavorito(livro: Livro): void {
+    toggleFavorito(livro)
   }
 
   return (
@@ -268,7 +275,17 @@ export function Catalogo() {
         <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
           {livros.map((livro) => (
             <div key={livro.id} className="col">
-              <div className="card h-100 border-0 shadow-sm hover-shadow transition">
+              <div className="card h-100 border-0 shadow-sm hover-shadow transition position-relative">
+                <button
+                  type="button"
+                  className={`btn btn-sm position-absolute top-0 end-0 m-2 ${isFavorito(livro.id) ? 'btn-danger' : 'btn-light'}`}
+                  onClick={() => handleToggleFavorito(livro)}
+                  title={isFavorito(livro.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                  aria-label={isFavorito(livro.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                  style={{ zIndex: 1 }}
+                >
+                  {isFavorito(livro.id) ? <FaHeart /> : <FaRegHeart />}
+                </button>
                 <img src={livro.imagem_capa} className="card-img-top" alt={livro.titulo} style={{ height: '300px', objectFit: 'cover' }} />
                 <div className="card-body">
                   <h5 className="card-title font-serif">{livro.titulo}</h5>
@@ -279,6 +296,7 @@ export function Catalogo() {
                   <div className="d-flex justify-content-between align-items-center gap-2">
                     <span className="fw-bold text-dark"> R$ {Number(livro.preco).toFixed(2)} </span>
                     <button disabled={livro.estoque === 0} className="btn btn-outline-dark btn-sm" onClick={() => handleAddToCart(livro)}>
+                      <FaShoppingCart className="me-1" />
                       {livro.estoque === 0 ? 'Indisponível' : 'Adicionar ao Carrinho'}
                     </button>
                   </div>

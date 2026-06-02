@@ -1,12 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import logo from '../assets/logoLivraria2.png'
-import { FaShoppingCart } from 'react-icons/fa'
-import { useEffect } from 'react'
+import { FaHeart, FaShoppingCart } from 'react-icons/fa'
+import { useFavorites } from '../contexts/FavoritesContext'
 
 
 export function Navbar() {
     const { user, autenticado, isAdmin, logout } = useAuth()
+    const { favoritosIds } = useFavorites()
     const navigate = useNavigate()
    
     async function handleLogout(): Promise<void>{
@@ -55,6 +56,14 @@ export function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-link" to="/carrinho">
                                     <FaShoppingCart size={20} /> Carrinho
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/favoritos">
+                                    <FaHeart size={18} /> Favoritos
+                                    {favoritosIds.length > 0 && (
+                                        <span className="badge bg-light text-dark ms-1">{favoritosIds.length}</span>
+                                    )}
                                 </Link>
                             </li>
                             <li className="nav-item">
