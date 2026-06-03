@@ -204,6 +204,49 @@ class LivroTest extends TestCase
                  ->assertJsonFragment(['id' => $livro->id]);
     }
 
+    public function test_comprador_pode_visualizar_detalhes_do_livro_pelo_slug(): void
+    {
+        $auth = $this->loginComoComprador();
+        $autor = Autor::factory()->create(['nome' => 'Robert Martin']);
+        $categoria = Categoria::factory()->create([
+            'nome' => 'Programação',
+            'slug' => 'programacao',
+        ]);
+        $livro = Livro::factory()->create([
+            'autor_id' => $autor->id,
+            'categoria_id' => $categoria->id,
+            'titulo' => 'Codigo Limpo',
+            'slug' => 'codigo-limpo',
+            'descricao' => 'Boas praticas de desenvolvimento',
+            'isbn' => '978-85-00000-00-1',
+            'numero_paginas' => 425,
+            'imagem_capa' => 'https://example.com/codigo-limpo.png',
+            'sobre' => 'Um guia para escrever software melhor.',
+            'preco' => 89.90,
+            'estoque' => 8,
+        ]);
+
+        $response = $this->getJson(
+            '/api/catalogo/livros/codigo-limpo',
+            $this->headerComToken($auth['token'])
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonPath('id', $livro->id)
+            ->assertJsonPath('titulo', 'Codigo Limpo')
+            ->assertJsonPath('slug', 'codigo-limpo')
+            ->assertJsonPath('descricao', 'Boas praticas de desenvolvimento')
+            ->assertJsonPath('isbn', '978-85-00000-00-1')
+            ->assertJsonPath('numero_paginas', 425)
+            ->assertJsonPath('imagem_capa', 'https://example.com/codigo-limpo.png')
+            ->assertJsonPath('sobre', 'Um guia para escrever software melhor.')
+            ->assertJsonPath('autor.id', $autor->id)
+            ->assertJsonPath('autor.nome', 'Robert Martin')
+            ->assertJsonPath('categoria.id', $categoria->id)
+            ->assertJsonPath('categoria.nome', 'Programação')
+            ->assertJsonPath('estoque', 8);
+    }
+
     public function test_admin_pode_criar_livro(){
         $auth = $this->loginComoAdmin();
         $autor = Autor::factory()->create();

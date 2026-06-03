@@ -14,6 +14,10 @@ export function Favoritos() {
         navigate('/carrinho')
     }
 
+    function handleVerDetalhes(livro: Livro): void {
+       navigate(`/livros/${livro.slug}`)
+    }
+
     if (carregandoFavoritos) {
         return (
             <div className="d-flex justify-content-center py-5">
@@ -56,7 +60,8 @@ export function Favoritos() {
                                 src={livro.imagem_capa}
                                 className="card-img-top"
                                 alt={livro.titulo}
-                                style={{ height: '300px', objectFit: 'cover' }}
+                                style={{ height: '300px', objectFit: 'cover', cursor:'pointer' }}
+                                onClick={() => handleVerDetalhes(livro)}
                             />
                             <div className="card-body d-flex flex-column">
                                 <h5 className="card-title font-serif">{livro.titulo}</h5>

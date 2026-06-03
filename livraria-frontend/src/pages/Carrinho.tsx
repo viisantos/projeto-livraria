@@ -1,6 +1,6 @@
 import { useCart } from '../contexts/CartContext'
 import { useNavigate } from 'react-router-dom'
-import { FaPlus, FaMinus } from 'react-icons/fa'
+import { FaPlus, FaMinus, FaArrowLeft } from 'react-icons/fa'
 
 export function Carrinho(){
     const { cart, aumentarQuantidade, diminuirQuantidade, removeFromCart, total } = useCart()
@@ -27,7 +27,13 @@ export function Carrinho(){
     return (
         <>
         <div className="container py-5">
-            <h2 className="mb-4">Seu Carrinho</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="mb-4">Seu Carrinho</h2>
+                <button className="btn btn-outline-secondary btn-sm mb-4" onClick={() => navigate('/catalogo')}>
+                    <FaArrowLeft className="me-1" />
+                    Voltar ao catálogo
+                </button>
+            </div>
             <div className="list-group mb-4">
                 { cart.map((item) => (
                     <div key={item.livroId} className="list-group-item d-flex justify-content-between align-items-center">

@@ -25,6 +25,7 @@ import { CheckoutPage } from './pages/CheckoutPage'
 import { CheckoutSucesso } from './pages/CheckoutSucesso'
 import { Carrinho } from './pages/Carrinho'
 import { Favoritos } from './pages/Favoritos'
+import { DetalheLivro } from './pages/DetalheLivro'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { HistoricoPedidos } from './pages/historicoPedidos'
 
@@ -94,6 +95,10 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/catalogo" element={
                       <ProtectedRoute> <Catalogo /> </ProtectedRoute>
+                    } />
+
+                    <Route path="/livros/:slug" element={
+                      <ProtectedRoute> <DetalheLivro /> </ProtectedRoute>
                     } />
 
                     <Route path="/sucesso" element={
@@ -174,4 +179,3 @@ function App() {
 }
 
 export default App
-

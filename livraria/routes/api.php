@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function(){
 
     //comprador e admin, ambos podem visuaizar catálogo
     Route::get('/catalogo', [LivroController::class, 'catalogo']);
+    Route::get('/catalogo/livros/{livro:slug}', [LivroController::class, 'show']);
     Route::get('/livros', [LivroController::class, 'index']);
     Route::get('/livros/{livro}', [LivroController::class, 'show']);
     Route::get('/me/favoritos', [FavoritoController::class, 'index']);

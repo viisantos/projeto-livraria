@@ -134,6 +134,10 @@ export function Catalogo() {
     toggleFavorito(livro)
   }
 
+  function handleVerDetalhes(livro: Livro): void {
+    navigate(`/livros/${livro.slug}`)
+  }
+
   return (
     <div className="container py-5">
       <h2 className="font-serif mb-4 text-center"> Nossa Coleção </h2>
@@ -286,9 +290,21 @@ export function Catalogo() {
                 >
                   {isFavorito(livro.id) ? <FaHeart /> : <FaRegHeart />}
                 </button>
-                <img src={livro.imagem_capa} className="card-img-top" alt={livro.titulo} style={{ height: '300px', objectFit: 'cover' }} />
+                <img
+                  src={livro.imagem_capa}
+                  className="card-img-top"
+                  alt={livro.titulo}
+                  style={{ height: '300px', objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={() => handleVerDetalhes(livro)}
+                />
                 <div className="card-body">
-                  <h5 className="card-title font-serif">{livro.titulo}</h5>
+                  <button
+                    type="button"
+                    className="btn btn-link p-0 text-start text-dark text-decoration-none"
+                    onClick={() => handleVerDetalhes(livro)}
+                  >
+                    <h5 className="card-title font-serif">{livro.titulo}</h5>
+                  </button>
                   <p className="text-muted small">{livro.autor?.nome}</p>
                   <small className="text-muted d-block mb-2">
                     Estoque: {livro.estoque}
@@ -300,6 +316,9 @@ export function Catalogo() {
                       {livro.estoque === 0 ? 'Indisponível' : 'Adicionar ao Carrinho'}
                     </button>
                   </div>
+                  <button className="btn btn-link btn-sm p-0 mt-3 text-dark" onClick={() => handleVerDetalhes(livro)}>
+                    Ver detalhes
+                  </button>
                 </div>
               </div>  
             </div>

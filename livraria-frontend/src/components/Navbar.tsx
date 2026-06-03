@@ -3,12 +3,15 @@ import { useAuth } from '../hooks/useAuth'
 import logo from '../assets/logoLivraria2.png'
 import { FaHeart, FaShoppingCart } from 'react-icons/fa'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { useCart } from '../contexts/CartContext'
 
 
 export function Navbar() {
     const { user, autenticado, isAdmin, logout } = useAuth()
     const { favoritosIds } = useFavorites()
+    const { cart } = useCart()
     const navigate = useNavigate()
+    const totalItensCarrinho = cart.reduce((total, item) => total + item.quantidade, 0)
    
     async function handleLogout(): Promise<void>{
         await logout()
@@ -56,6 +59,9 @@ export function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-link" to="/carrinho">
                                     <FaShoppingCart size={20} /> Carrinho
+                                    {totalItensCarrinho > 0 && (
+                                        <span className="badge bg-light text-dark ms-1">{totalItensCarrinho}</span>
+                                    )}
                                 </Link>
                             </li>
                             <li className="nav-item">
