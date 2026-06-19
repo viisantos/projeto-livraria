@@ -38,6 +38,25 @@ export interface Livro{
     //atualizado_em: string
 }
 
+export interface PedidoItem {
+    livro_id: number
+    titulo: string
+    imagem_capa: string
+    quantidade: number
+    preco_unitario: number | string
+    subtotal: number | string
+}
+
+export type PedidoStatus = 'pendente' | 'pago' | 'falha'
+
+export interface Pedido {
+    id: number
+    status: PedidoStatus
+    total: number | string
+    created_at: string
+    itens: PedidoItem[]
+}
+
 export interface PaginatedResponse<T> {
     data: T[]
     meta: {

@@ -103,22 +103,22 @@ class PagamentoService{
             $this->registrarPagamentoAprovado($paymentIntentId);
 
             return [
-                'status' => 'pago',
+                'status' => Pedido::STATUS_PAGO,
                 'message' => 'Pagamento confirmado com sucesso.',
             ];
         }
 
         if (in_array($intent->status, ['requires_payment_method', 'canceled'], true)) {
-            $this->pedidoRepository->updateStatusByStripeId($paymentIntentId, 'falha');
+            $this->pedidoRepository->updateStatusByStripeId($paymentIntentId, Pedido::STATUS_FALHA);
 
             return [
-                'status' => 'falha',
+                'status' => Pedido::STATUS_FALHA,
                 'message' => 'O pagamento não foi concluído. Confira os dados do cartão e tente novamente.',
             ];
         }
 
         return [
-            'status' => 'pending',
+            'status' => Pedido::STATUS_PENDENTE,
             'message' => 'O pagamento ainda está sendo processado. Aguarde alguns instantes e confira seu histórico de pedidos.',
         ];
     }
@@ -135,11 +135,11 @@ class PagamentoService{
                 throw new \Exception('Pedido não encontrado');
             }
 
-            if ($pedido->status === 'pago') {
+            if ($pedido->status === Pedido::STATUS_PAGO) {
                 return;
             }
 
-            if ($pedido->status !== 'pending') {
+            if ($pedido->status !== Pedido::STATUS_PENDENTE) {
                 throw new \Exception('Pedido não está pendente');
             }
 
@@ -151,7 +151,7 @@ class PagamentoService{
                 $livro->decrement('estoque', $item->quantidade);
             }
 
-            $pedido->status = 'pago';
+            $pedido->status = Pedido::STATUS_PAGO;
             $pedido->save();
         });
     }

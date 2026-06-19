@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function(){
     Route::post('/payment/intent', [PagamentoController::class, 'intencaoPagamento']);
     Route::post('/payment/confirm', [PagamentoController::class, 'confirmarPagamento']);
     Route::get('/historico-pedidos', [historicoPedidos::class, 'historico_pedidos']);
+    Route::get('/pedidos/{pedido}', [historicoPedidos::class, 'show']);
 
 
     //oprerações restritas à admin:

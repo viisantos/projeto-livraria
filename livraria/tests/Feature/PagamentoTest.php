@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\PaymentGatewayException;
+use App\Models\Pedido;
 use App\Services\PagamentoService;
 use Mockery;
 
@@ -50,7 +51,7 @@ class PagamentoTest extends TestCase
             ->once()
             ->with('pi_teste_123', $auth['user']->id)
             ->andReturn([
-                'status' => 'pago',
+                'status' => Pedido::STATUS_PAGO,
                 'message' => 'Pagamento confirmado com sucesso.',
             ]);
 
@@ -64,7 +65,7 @@ class PagamentoTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'status' => 'pago',
+                'status' => Pedido::STATUS_PAGO,
                 'message' => 'Pagamento confirmado com sucesso.',
             ]);
     }

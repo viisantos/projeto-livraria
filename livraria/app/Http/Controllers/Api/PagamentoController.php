@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Exceptions\PaymentGatewayException;
 use App\Http\Controllers\Controller;
+use App\Models\Pedido;
 use App\Services\PagamentoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -63,8 +64,8 @@ class PagamentoController extends Controller
             );
 
             $httpStatus = match ($resultado['status']) {
-                'pago' => 200,
-                'falha' => 422,
+                Pedido::STATUS_PAGO => 200,
+                Pedido::STATUS_FALHA => 422,
                 default => 202,
             };
 

@@ -11,7 +11,7 @@ class PedidoRepository implements PedidoRepositoryInterface{
     public function createPedidoWithItems(int $userId, float $total, string $stripeIntentId, array $items): ?Pedido {
             try {
                 $pedidoExistente = Pedido::where('user_id', '=', $userId)
-                    ->where('status', '=', 'pending')
+                    ->where('status', '=', Pedido::STATUS_PENDENTE)
                     ->where('stripe_payment_id', '=', $stripeIntentId)
                     ->latest()
                     ->first();
@@ -24,7 +24,7 @@ class PedidoRepository implements PedidoRepositoryInterface{
                     $pedido->user_id = $userId;
                     $pedido->total = $total;
                     $pedido->stripe_payment_id = $stripeIntentId;
-                    $pedido->status = 'pending';
+                    $pedido->status = Pedido::STATUS_PENDENTE;
                     $pedido->save();
                     foreach ($items as $item) {
                         $pedidoItem = new PedidoItems();
@@ -53,7 +53,7 @@ class PedidoRepository implements PedidoRepositoryInterface{
     public function updateStatusByStripeId(string $stripeIntentId, string $status): void {
         try {
             DB::transaction(function () use ($stripeIntentId, $status) {
-                $pedido = Pedido::where('status', '=', 'pending')
+                $pedido = Pedido::where('status', '=', Pedido::STATUS_PENDENTE)
                         ->where('stripe_payment_id','=', $stripeIntentId)
                         ->first();
                 if (!$pedido) {
@@ -66,10 +66,10 @@ class PedidoRepository implements PedidoRepositoryInterface{
             Log::info("Exceção de atualização de pedido : ". $e);
             throw $e;
         }
-        //Log::info("pedido que foi atualizado : ". Pedido::where('status', '=', 'pending')
+        //Log::info("pedido que foi atualizado : ". Pedido::where('status', '=', Pedido::STATUS_PENDENTE)
         //      ->where('stripe_payment_id','=', $stripeIntentId)->first());
 
-        /*Pedido::where('status', '=', 'pending')
+        /*Pedido::where('status', '=', Pedido::STATUS_PENDENTE)
               ->where('stripe_payment_id','=', $stripeIntentId)
               ->update(['status' => $status]);*/
     }

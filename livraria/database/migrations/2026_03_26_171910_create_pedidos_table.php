@@ -30,7 +30,7 @@ return new class extends Migration
 
             $table->decimal('total', 8, 2);
             $table->string('stripe_payment_id')->nullable();
-            $table->string('status')->default('pending');
+            $table->string('status')->default('pendente');
 
             $table->timestamps();
         });

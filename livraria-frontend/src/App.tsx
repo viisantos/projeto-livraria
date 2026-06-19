@@ -28,6 +28,7 @@ import { Favoritos } from './pages/Favoritos'
 import { DetalheLivro } from './pages/DetalheLivro'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { HistoricoPedidos } from './pages/historicoPedidos'
+import { DetalhePedido } from './pages/DetalhePedido'
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -111,6 +112,10 @@ function App() {
 
                     <Route path="/pedidos" element={                    
                       <ProtectedRoute><HistoricoPedidos/></ProtectedRoute>
+                    }/>
+
+                    <Route path="/pedidos/:id" element={
+                      <ProtectedRoute><DetalhePedido /></ProtectedRoute>
                     }/>
 
                     <Route path="/carrinho" element={ 

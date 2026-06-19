@@ -14,6 +14,10 @@ class Pedido extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDENTE = 'pendente';
+    public const STATUS_PAGO = 'pago';
+    public const STATUS_FALHA = 'falha';
+
     protected $table = 'pedidos';
 
     protected $fillable = [

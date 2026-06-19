@@ -48,7 +48,7 @@ class StripeWebhookController extends Controller{
                 Log::error("Pedido não encontrado para Stripe Intent ID: ". $paymentIntent->id);
                 return;
             }
-            else if($pedido->status === 'pago'){
+            else if($pedido->status === Pedido::STATUS_PAGO){
                 Log::info("Pedido já marcado como pago para Stripe Intent ID: ". $paymentIntent->id);
                 return;
             }
@@ -58,7 +58,7 @@ class StripeWebhookController extends Controller{
     }
 
     private function handlePaymentFailed(object $paymentIntent){
-        $this->pedidoRepository->updateStatusByStripeId($paymentIntent->id, 'falha');
+        $this->pedidoRepository->updateStatusByStripeId($paymentIntent->id, Pedido::STATUS_FALHA);
         Log::warning("Pagamento falho para Stripe Intent ID: ". $paymentIntent->id);
     }
 
