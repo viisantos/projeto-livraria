@@ -57,6 +57,21 @@ export interface Pedido {
     itens: PedidoItem[]
 }
 
+export interface BibliotecaLivro {
+    id: number
+    titulo: string
+    imagem_capa: string
+    formato_ebook: 'pdf' | 'epub' | null
+    leitura_disponivel: boolean
+    endpoint_leitura?: string
+    adquirido_em: string
+    autor: Autor
+}
+
+export interface BibliotecaResponse {
+    data: BibliotecaLivro[]
+}
+
 export interface PaginatedResponse<T> {
     data: T[]
     meta: {

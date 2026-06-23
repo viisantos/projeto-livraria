@@ -22,6 +22,8 @@ class Livro extends Model
         'numero_paginas',
         'publicacao',
         'imagem_capa',
+        'arquivo_ebook',
+        'formato_ebook',
         'sobre',
         'preco',
         'categoria_id',

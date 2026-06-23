@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PagamentoController;
 use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\historicoPedidos;
 use App\Http\Controllers\Api\FavoritoController;
+use App\Http\Controllers\Api\BibliotecaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,8 @@ Route::middleware('auth')->group(function(){
     Route::post('/payment/confirm', [PagamentoController::class, 'confirmarPagamento']);
     Route::get('/historico-pedidos', [historicoPedidos::class, 'historico_pedidos']);
     Route::get('/pedidos/{pedido}', [historicoPedidos::class, 'show']);
+    Route::get('/minha-biblioteca', [BibliotecaController::class, 'index']);
+    Route::get('/biblioteca/livros/{livro}/leitura', [BibliotecaController::class, 'leitura']);
 
 
     //oprerações restritas à admin:

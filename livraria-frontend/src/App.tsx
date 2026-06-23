@@ -29,6 +29,8 @@ import { DetalheLivro } from './pages/DetalheLivro'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { HistoricoPedidos } from './pages/historicoPedidos'
 import { DetalhePedido } from './pages/DetalhePedido'
+import { MinhaBiblioteca } from './pages/MinhaBiblioteca'
+import { LeitorEbook } from './pages/LeitorEbook'
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -116,6 +118,14 @@ function App() {
 
                     <Route path="/pedidos/:id" element={
                       <ProtectedRoute><DetalhePedido /></ProtectedRoute>
+                    }/>
+
+                    <Route path="/minha-biblioteca" element={
+                      <ProtectedRoute><MinhaBiblioteca /></ProtectedRoute>
+                    }/>
+
+                    <Route path="/minha-biblioteca/:id/ler" element={
+                      <ProtectedRoute><LeitorEbook /></ProtectedRoute>
                     }/>
 
                     <Route path="/carrinho" element={ 

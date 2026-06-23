@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\LivroCollection;
 use App\Http\Resources\LivroResource;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class LivroController extends Controller
 {
@@ -59,7 +60,7 @@ class LivroController extends Controller
         ]);*/
         //Gate::authorize('create', Livro::class);
         Log::info("Livro : ". $request);
-        $livro = $this->service->criar($request->validated());
+        $livro = $this->service->criar($this->dadosDoLivro($request));
 
         return response()->json($livro, 201);
     }
@@ -80,7 +81,13 @@ class LivroController extends Controller
     public function update(UpdateLivroRequest $request, Livro $livro)
     {
         //Gate::authorize('update', $livro);
-        $livro = $this->service->atualizar($livro, $request->validated());
+        $arquivoAnterior = $livro->arquivo_ebook;
+        $livro = $this->service->atualizar($livro, $this->dadosDoLivro($request));
+
+        if ($arquivoAnterior && $arquivoAnterior !== $livro->arquivo_ebook) {
+            Storage::disk('local')->delete($arquivoAnterior);
+        }
+
         return response()->json(new LivroResource($livro));
     }
 
@@ -90,7 +97,28 @@ class LivroController extends Controller
     public function destroy(Livro $livro)
     {
         //Gate::authorize('delete', $livro);
+        $arquivoEbook = $livro->arquivo_ebook;
         $this->service->remover($livro);
+
+        if ($arquivoEbook) {
+            Storage::disk('local')->delete($arquivoEbook);
+        }
+
         return response()->noContent();
+    }
+
+    private function dadosDoLivro(StoreLivroRequest|UpdateLivroRequest $request): array
+    {
+        $dados = $request->validated();
+        unset($dados['ebook']);
+
+        if ($request->hasFile('ebook')) {
+            $arquivo = $request->file('ebook');
+
+            $dados['arquivo_ebook'] = $arquivo->store('ebooks', 'local');
+            $dados['formato_ebook'] = strtolower($arquivo->getClientOriginalExtension());
+        }
+
+        return $dados;
     }
 }

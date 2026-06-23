@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import logo from '../assets/logoLivraria2.png'
-import { FaHeart, FaShoppingCart } from 'react-icons/fa'
+import { FaBookOpen, FaHeart, FaShoppingCart } from 'react-icons/fa'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { useCart } from '../contexts/CartContext'
 
@@ -75,6 +75,11 @@ export function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-link" to="/pedidos">
                                     Meus pedidos 
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/minha-biblioteca">
+                                    <FaBookOpen size={18} /> Minha biblioteca
                                 </Link>
                             </li>
                             <li className="nav-item">

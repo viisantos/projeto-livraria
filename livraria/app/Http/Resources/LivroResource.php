@@ -23,6 +23,7 @@ class LivroResource extends JsonResource
             'numero_paginas' => $this->numero_paginas,
             'publicacao'     => $this->publicacao,
             'imagem_capa'    => $this->imagem_capa,
+            'formato_ebook'  => $this->formato_ebook,
             'sobre'          => $this->sobre,
             'preco'          => $this->preco,
 
