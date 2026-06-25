@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../../api/axios'
 
-import type { Autor, Categoria, PaginatedResponse } from '../../types'
+import { PaginatedEntitySelect } from '../../components/PaginatedEntitySelect'
 
 interface NovoLivroData {
   titulo: string
@@ -16,7 +16,6 @@ interface NovoLivroData {
   autor_id: string
   categoria_id: string
   preco: string
-  estoque: string
 }
 
 export function NovoLivro() {
@@ -32,32 +31,12 @@ export function NovoLivro() {
     sobre: '',
     autor_id:'',
     categoria_id:'',
-    preco: '',
-    estoque: ''   
+    preco: ''
   }) 
 
-  const [autores, setAutores] = useState<Autor[]>([])
-  const [categorias, setCategorias] = useState<Categoria[]>([])
   const [erros, setErros] = useState<Record<string, string[]>>({})
   const [carregando, setCarregando] = useState<boolean>(false)
-
-  useEffect(() => {
-    buscarOpcoesSelects()
-  }, [])
-
-  async function buscarOpcoesSelects(): Promise<void> {
-    try{
-      const [resAutores, resCategorias] = await Promise.all([
-        api.get<PaginatedResponse<Autor>>('/autores?per_page=100'),
-        api.get<PaginatedResponse<Categoria>>('/categorias?per_page=100'),
-      ])
-
-      setAutores(resAutores.data.data)
-      setCategorias(resCategorias.data.data)
-    } catch {
-      //nesse caso os selectds ficam vazios
-    }
-  }
+  const [ebook, setEbook] = useState<File | null>(null)
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -86,14 +65,11 @@ export function NovoLivro() {
     setCarregando(true)
 
     try{
-      await api.post('/livros', {
-        ...dados,
-        numero_paginas: Number(dados.numero_paginas),
-        autor_id: Number(dados.autor_id),
-        categoria_id: Number(dados.categoria_id),
-        preco: Number(dados.preco.replace(',', '.')),
-        estoque: Number(dados.estoque)
-      })
+      const formData = new FormData()
+      Object.entries(dados).forEach(([campo, valor]) => formData.append(campo, valor))
+      formData.set('preco', dados.preco.replace(',', '.'))
+      if (ebook) formData.append('ebook', ebook)
+      await api.post('/livros', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
 
       navigate('/admin/livros')
     } catch (error: any) {
@@ -145,37 +121,22 @@ export function NovoLivro() {
                   />
                   {erroDocampo('slug') && <div className="invalid-feedback">{erroDocampo('slug')}</div>}
                 </div>
-              </div>  
+              </div>
+              <div className="mb-3">
+                <label htmlFor="ebook" className="form-label">Arquivo do ebook</label>
+                <input type="file" id="ebook" name="ebook" accept=".pdf,.epub,application/pdf,application/epub+zip" className="form-control" onChange={(e) => setEbook(e.target.files?.[0] ?? null)} />
+                <small className="text-muted">PDF ou EPUB, até 50 MB.</small>
+                {ebook && <div className="form-text">{ebook.name}</div>}
+                {erroDocampo('ebook') && <div className="text-danger small">{erroDocampo('ebook')}</div>}
+              </div>
 
               <div className="row mb-3">
                 <div className="col-md-6">
-                  <label htmlFor="autor_id" className="form-label"> Autor </label>
-                  <select id="autor_id" name="autor_id" className={`form-select ${erroDocampo('autor_id') ? 'is-invalid' : ''}`}
-                  value={ dados.autor_id } onChange={handleChange} required >
-                    <option value="">Selecione um autor</option>
-                    { autores.map ((autor) => (
-                      <option key={autor.id} value={autor.id}> {autor.nome} </option>
-                    ))} 
-                  </select>
-                  { erroDocampo('autor_id') && <div className="invalid-feedback">{ erroDocampo('autor_id') }</div> }
+                  <PaginatedEntitySelect endpoint="/autores" id="autor_id" label="Autor" name="autor_id" value={dados.autor_id} onChange={(value) => setDados({ ...dados, autor_id: value })} error={erroDocampo('autor_id')} />
                 </div>
                 
                 <div className="col-md-6">
-                  <label htmlFor="categoria_id" className="form-label">Categoria</label>
-                   <select
-                    id="categoria_id"
-                    name="categoria_id"
-                    className={`form-select ${erroDocampo('categoria_id') ? 'is-invalid' : ''}`}
-                    value={dados.categoria_id}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    {categorias.map((categoria) => (
-                      <option key={categoria.id} value={categoria.id}>{categoria.nome}</option>
-                    ))}
-                  </select>
-                  { erroDocampo('categoria_id') && <div className="invalid-feedback"> { erroDocampo('categoria_id') } </div> }
+                  <PaginatedEntitySelect endpoint="/categorias" id="categoria_id" label="Categoria" name="categoria_id" value={dados.categoria_id} onChange={(value) => setDados({ ...dados, categoria_id: value })} error={erroDocampo('categoria_id')} />
                 </div>
               </div>
                 
@@ -213,13 +174,6 @@ export function NovoLivro() {
                   <input type="number" id="numero_paginas" name="numero_paginas" className={`form-control ${erroDocampo('numero_paginas') ? 'is-invalid':''}`}
                   value={dados.numero_paginas} onChange={handleChange} placeholder="320" min={1} required />
                   { erroDocampo('numero_paginas') && <div className="invalid-feedback">{ erroDocampo('numero_paginas') }</div> } 
-                </div>
-
-                <div className="col-md-4">
-                  <label htmlFor="estoque" className="form-label"> Estoque </label>
-                  <input type="number" id="estoque" name="estoque" className={`form-control ${erroDocampo('estoque') ? 'is-invalid':''}`} 
-                  value={dados.estoque} onChange={handleChange} placeholder="320" min={0} required />
-                  { erroDocampo('estoque') && <div className="invalid-feedback">{ erroDocampo('estoque') }</div> } 
                 </div>
 
                 <div className="col-md-4">

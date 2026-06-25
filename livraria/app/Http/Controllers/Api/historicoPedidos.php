@@ -41,10 +41,9 @@ class historicoPedidos extends Controller
                 return[
                     'livro_id'       => $item->livro_id,
                     'titulo'         => $item->livro->titulo,
-                    'imagem_capa'    => $item->livro->imagem_capa,
-                    'quantidade'     => $item->quantidade,
-                    'preco_unitario' => $item->preco,
-                    'subtotal'       => $item->quantidade * $item->preco,
+                    'imagem_capa' => $item->livro->imagem_capa,
+                    'preco'       => $item->preco,
+                    'subtotal'    => $item->preco,
                 ];
             })
         ];

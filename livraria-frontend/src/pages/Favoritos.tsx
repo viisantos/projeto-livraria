@@ -66,7 +66,6 @@ export function Favoritos() {
                             <div className="card-body d-flex flex-column">
                                 <h5 className="card-title font-serif">{livro.titulo}</h5>
                                 <p className="text-muted small">{livro.autor?.nome}</p>
-                                <small className="text-muted d-block mb-2">Estoque: {livro.estoque}</small>
                                 <span className="fw-bold text-dark mb-3">R$ {Number(livro.preco).toFixed(2)}</span>
 
                                 <div className="d-flex gap-2 mt-auto">
@@ -78,12 +77,11 @@ export function Favoritos() {
                                         <FaHeart />
                                     </button>
                                     <button
-                                        disabled={livro.estoque === 0}
                                         className="btn btn-outline-dark btn-sm flex-fill"
                                         onClick={() => handleAddToCart(livro)}
                                     >
                                         <FaShoppingCart className="me-1" />
-                                        {livro.estoque === 0 ? 'Indisponível' : 'Adicionar'}
+                                        Adicionar
                                     </button>
                                 </div>
                             </div>

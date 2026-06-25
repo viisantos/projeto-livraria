@@ -29,9 +29,8 @@ class PedidoRepository implements PedidoRepositoryInterface{
                     foreach ($items as $item) {
                         $pedidoItem = new PedidoItems();
                         $pedidoItem->pedido_id  = $pedido->id;
-                        $pedidoItem->livro_id   = $item['livro_id'];
-                        $pedidoItem->quantidade = $item['quantidade'];
-                        $pedidoItem->preco      = $item['preco'];
+                        $pedidoItem->livro_id = $item['livro_id'];
+                        $pedidoItem->preco    = $item['preco'];
                         $pedidoItem->save();
                     }
                     Log::info("Itens do pedido : ". $pedido->itens()->get());

@@ -27,9 +27,7 @@ class PagamentoService{
 
         //$total = $livros->sum('preco');
 
-        $total = collect($livros)->sum(function($item){
-            return $item['price'] * $item['quantidade'];
-        });
+        $total = collect($livros)->sum('price');
 
         try {
             $intent = PaymentIntent::create([
@@ -59,9 +57,8 @@ class PagamentoService{
 
         $pedidoItems = collect($livros)->map(function($livro){
             return [
-                'livro_id'       => $livro['livroId'],
-                'quantidade'     => $livro['quantidade'],
-                'preco'          => $livro['price']
+                'livro_id' => $livro['livroId'],
+                'preco'    => $livro['price']
             ];
         })->toArray();
 
@@ -141,14 +138,6 @@ class PagamentoService{
 
             if ($pedido->status !== Pedido::STATUS_PENDENTE) {
                 throw new \Exception('Pedido não está pendente');
-            }
-
-            foreach($pedido->itens as $item){
-                $livro = $item->livro;
-                if($livro->estoque < $item->quantidade){
-                    throw new \Exception("Estoque insuficiente para o livro: ". $livro->titulo);
-                }
-                $livro->decrement('estoque', $item->quantidade);
             }
 
             $pedido->status = Pedido::STATUS_PAGO;

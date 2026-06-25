@@ -26,8 +26,7 @@ class Livro extends Model
         'formato_ebook',
         'sobre',
         'preco',
-        'categoria_id',
-        'estoque'
+        'categoria_id'
     ];
 
     protected $hidden = [

@@ -33,7 +33,6 @@ export interface Livro{
     autor: Autor
     categoria: Categoria
     preco: number
-    estoque: number
     //criado_em: string
     //atualizado_em: string
 }
@@ -42,8 +41,7 @@ export interface PedidoItem {
     livro_id: number
     titulo: string
     imagem_capa: string
-    quantidade: number
-    preco_unitario: number | string
+    preco: number | string
     subtotal: number | string
 }
 

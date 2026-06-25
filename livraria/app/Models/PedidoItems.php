@@ -16,7 +16,6 @@ class PedidoItems extends Model
     protected $fillable = [
         'pedido_id',
         'livro_id',
-        'quantidade',
         'preco'
     ];
 

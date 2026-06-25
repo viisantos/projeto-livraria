@@ -55,7 +55,6 @@ Route::middleware('auth:api')->get('/jwt-test', function(){
 /*
 Route::middleware('auth')->group(function(){
     Route::apiResource('categorias', CategoriaController::class);
-    Route::apiResource('autor', AutorController::class);
     Route::apiResource('livros', LivroController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -88,14 +87,13 @@ Route::middleware('auth')->group(function(){
     Route::delete('/livros/{livro}/favoritar', [FavoritoController::class, 'destroy']);
 
 
-    Route::apiResource('categorias', CategoriaController::class);
     Route::post('/payment/intent', [PagamentoController::class, 'intencaoPagamento']);
     Route::post('/payment/confirm', [PagamentoController::class, 'confirmarPagamento']);
     Route::get('/historico-pedidos', [historicoPedidos::class, 'historico_pedidos']);
     Route::get('/pedidos/{pedido}', [historicoPedidos::class, 'show']);
     Route::get('/minha-biblioteca', [BibliotecaController::class, 'index']);
     Route::get('/biblioteca/livros/{livro}/leitura', [BibliotecaController::class, 'leitura']);
-
+    
 
     //oprerações restritas à admin:
     Route::middleware('role:admin')->group(function(){
@@ -104,6 +102,7 @@ Route::middleware('auth')->group(function(){
         Route::delete('/livros/{livro}', [LivroController::class, 'destroy']);
         Route::apiResource('autores', AutorController::class);
         Route::apiResource('usuarios', UserController::class);
+        Route::apiResource('categorias', CategoriaController::class);
     });
 });
 

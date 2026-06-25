@@ -16,11 +16,10 @@ export function NovoAutor() {
   const [erros, setErros] = useState<Record<string, string[]>>({})
   const [carregando, setCarregando] = useState<boolean>(false)
   const [modalAberta, setModalAberta] = useState<boolean>(false)
+  const [erroGeral, setErroGeral] = useState('')
 
   useEffect(() => {
-    if (carregando) {
-      setModalAberta(true)
-    }
+    if (!carregando) setModalAberta(false)
   }, [carregando])
   
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void {
@@ -30,6 +29,7 @@ export function NovoAutor() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
     e.preventDefault()
     setErros({})
+    setErroGeral('')
     setCarregando(true)
 
     try{
@@ -38,6 +38,8 @@ export function NovoAutor() {
     } catch(error: any) {
       if(error.response?.status === 422 ){
         setErros(error.response.data.errors)
+      } else {
+        setErroGeral('Não foi possível cadastrar o autor. Tente novamente.')
       }
     } finally {
       setCarregando(false)
@@ -61,6 +63,7 @@ export function NovoAutor() {
 
         <div className="card shadow-sm">
           <div className="card-body p-4">
+            {erroGeral && <div className="alert alert-danger">{erroGeral}</div>}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                   <label htmlFor="nome" className="form-label">Nome</label>
@@ -123,6 +126,7 @@ export function NovoAutor() {
                 <p>
                     Cadastro de autor Efetuado com sucesso!
                 </p>
+                <Link to="/admin/autores" className="btn btn-outline-secondary"> Retornar </Link>
                 </div>
             </div>
             </div>

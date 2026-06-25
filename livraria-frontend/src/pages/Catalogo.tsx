@@ -13,7 +13,6 @@ type CatalogoFiltros = {
   autor: string
   minPreco: string
   maxPreco: string
-  disponivel: boolean
   perPage: string
   ordenar: string
 }
@@ -24,7 +23,6 @@ const filtrosIniciais: CatalogoFiltros = {
   autor: '',
   minPreco: '',
   maxPreco: '',
-  disponivel: false,
   perPage: '12',
   ordenar: '',
 }
@@ -89,10 +87,6 @@ export function Catalogo() {
 
     if (filtrosAplicados.maxPreco) {
       params.max_preco = filtrosAplicados.maxPreco
-    }
-
-    if (filtrosAplicados.disponivel) {
-      params.disponivel = 1
     }
 
     if (filtrosAplicados.ordenar) {
@@ -242,19 +236,6 @@ export function Catalogo() {
             </select>
           </div>
 
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="form-check">
-              <input
-                id="disponivel"
-                type="checkbox"
-                className="form-check-input"
-                checked={filtros.disponivel}
-                onChange={(event) => setFiltros({ ...filtros, disponivel: event.target.checked })}
-              />
-              <label htmlFor="disponivel" className="form-check-label">Disponíveis</label>
-            </div>
-          </div>
-
           <div className="col-12 col-md-6 col-lg-4 d-flex gap-2">
             <button type="submit" className="btn btn-dark flex-fill">Aplicar filtros</button>
             <button type="button" className="btn btn-outline-secondary flex-fill" onClick={handleLimparFiltros}>
@@ -306,14 +287,11 @@ export function Catalogo() {
                     <h5 className="card-title font-serif">{livro.titulo}</h5>
                   </button>
                   <p className="text-muted small">{livro.autor?.nome}</p>
-                  <small className="text-muted d-block mb-2">
-                    Estoque: {livro.estoque}
-                  </small>
                   <div className="d-flex justify-content-between align-items-center gap-2">
                     <span className="fw-bold text-dark"> R$ {Number(livro.preco).toFixed(2)} </span>
-                    <button disabled={livro.estoque === 0} className="btn btn-outline-dark btn-sm" onClick={() => handleAddToCart(livro)}>
+                    <button className="btn btn-outline-dark btn-sm" onClick={() => handleAddToCart(livro)}>
                       <FaShoppingCart className="me-1" />
-                      {livro.estoque === 0 ? 'Indisponível' : 'Adicionar ao Carrinho'}
+                      Adicionar ao Carrinho
                     </button>
                   </div>
                   <button className="btn btn-link btn-sm p-0 mt-3 text-dark" onClick={() => handleVerDetalhes(livro)}>

@@ -1,9 +1,9 @@
 import { useCart } from '../contexts/CartContext'
 import { useNavigate } from 'react-router-dom'
-import { FaPlus, FaMinus, FaArrowLeft } from 'react-icons/fa'
+import { FaArrowLeft } from 'react-icons/fa'
 
 export function Carrinho(){
-    const { cart, aumentarQuantidade, diminuirQuantidade, removeFromCart, total } = useCart()
+    const { cart, removeFromCart, total } = useCart()
     const navigate = useNavigate()
 
     function formatarPreco(valor: Number) {
@@ -40,14 +40,8 @@ export function Carrinho(){
                         <div>
                             <h6 className="mb-1">{item.titulo}</h6>
                             <small className="text-muted">
-                                { formatarPreco(parseFloat(item.price * item.quantidade)) }
+                                { formatarPreco(item.price) }
                             </small>
-                        </div>
-                        <div>
-                            { item.quantidade > 1 && (<button className="btn btn-light" onClick={() => diminuirQuantidade(item.livroId)}> <FaMinus/> </button> )}
-                            <span>{item.quantidade}</span> 
-                            <button className="btn btn-light" onClick={() => aumentarQuantidade(item.livroId)}> <FaPlus/> </button>
-                          
                         </div>
                         <button className="btn btn-outline-danger btn-sm" onClick={() => removeFromCart(item.livroId)}>
                             Remover

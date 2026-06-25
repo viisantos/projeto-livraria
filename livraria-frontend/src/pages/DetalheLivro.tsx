@@ -122,10 +122,6 @@ export function DetalheLivro() {
                                 <strong>{formatarPreco(livro.preco)}</strong>
                             </div>
                             <div className="col-6 col-lg-3">
-                                <small className="text-muted d-block">Estoque</small>
-                                <strong>{livro.estoque > 0 ? `${livro.estoque} disponível` : 'Indisponível'}</strong>
-                            </div>
-                            <div className="col-6 col-lg-3">
                                 <small className="text-muted d-block">Páginas</small>
                                 <strong>{livro.numero_paginas}</strong>
                             </div>
@@ -150,12 +146,11 @@ export function DetalheLivro() {
 
                     <div className="d-flex flex-column flex-sm-row gap-2">
                         <button
-                            disabled={livro.estoque === 0}
                             className="btn btn-dark px-4"
                             onClick={handleAddToCart}
                         >
                             <FaShoppingCart className="me-2" />
-                            {livro.estoque === 0 ? 'Indisponível' : 'Adicionar ao carrinho'}
+                            Adicionar ao carrinho
                         </button>
                         <button className="btn btn-outline-dark px-4" onClick={() => navigate('/favoritos')}>
                             Ver favoritos

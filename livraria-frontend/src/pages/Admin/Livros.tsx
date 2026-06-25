@@ -118,7 +118,6 @@ export function Livros() {
                 <th>Capa</th>
                 <th>Título</th>
                 <th>Autor</th>
-                <th>Estoque</th>
                 <th>Categoria</th>
                 <th>Páginas</th>
                 <th>Publicação</th>
@@ -146,9 +145,6 @@ export function Livros() {
                   </td>  
                   <td>
                     {livro.autor?.nome ?? '-'}
-                  </td>
-                  <td>
-                    {livro.estoque}
                   </td>
                   <td>
                     { livro.categoria && (

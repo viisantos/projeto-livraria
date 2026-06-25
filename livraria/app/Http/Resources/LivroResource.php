@@ -29,8 +29,7 @@ class LivroResource extends JsonResource
 
             //Relacionamentos - só aparecem se forem carregados com with() - evita problema de performance e "N+1".
             'autor'         => new AutorResource($this->whenLoaded('autor')),
-            'categoria'     => new CategoriaResource($this->whenLoaded('categoria')),
-            'estoque'       => $this->estoque
+            'categoria'     => new CategoriaResource($this->whenLoaded('categoria'))
            //'criado_em'     => $this->created_at->format('d/m/Y'),
            //'atualizado_em' => $this->updated_at->format('d/m/Y')
         ];

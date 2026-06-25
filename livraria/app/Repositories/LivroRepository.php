@@ -91,10 +91,6 @@ class LivroRepository implements LivroRepositoryInterface{
             $query->where('preco', '<=', $filtros['max_preco']);
         }
 
-        if (!empty($filtros['disponivel'])) {
-            $query->where('estoque', '>', 0);
-        }
-
         $this->aplicarOrdenacao($query, $filtros['ordenar'] ?? null);
 
         $perPage = (int)($filtros['per_page'] ?? $perPage);

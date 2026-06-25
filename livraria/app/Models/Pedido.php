@@ -41,7 +41,7 @@ class Pedido extends Model
     public function livro(): BelongsToMany
     {
         return $this->belongsToMany(Livro::class, 'pedido_items', 'pedido_id', 'livro_id')
-                    ->withPivot('quantidade', 'preco')
+                    ->withPivot('preco')
                     ->withTimestamps();
     }
 

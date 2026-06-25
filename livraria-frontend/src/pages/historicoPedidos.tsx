@@ -91,7 +91,7 @@ export function HistoricoPedidos() {
                                 <div className="flex-grow-1">
                                     <h6 className="mb-1">{item.titulo}</h6>
                                     <small className="text-muted">
-                                        {item.quantidade} x {formatarPreco(item.preco_unitario)}
+                                        {formatarPreco(item.preco)}
                                     </small>
                                 </div>
 

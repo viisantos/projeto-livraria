@@ -22,8 +22,7 @@ class UpdateLivroRequest extends StoreLivroRequest{
             'ebook'          => 'nullable|file|mimes:pdf,epub|max:51200',
             'sobre'          => 'string',
             'categoria_id'   => 'sometimes|exists:categorias,id',
-            'preco'          => 'sometimes|numeric',
-            'estoque'        => 'sometimes|integer|min:0'
+            'preco'          => 'sometimes|numeric'
         ];
     }
 }

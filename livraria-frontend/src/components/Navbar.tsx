@@ -11,7 +11,7 @@ export function Navbar() {
     const { favoritosIds } = useFavorites()
     const { cart } = useCart()
     const navigate = useNavigate()
-    const totalItensCarrinho = cart.reduce((total, item) => total + item.quantidade, 0)
+    const totalItensCarrinho = cart.length
    
     async function handleLogout(): Promise<void>{
         await logout()
