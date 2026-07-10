@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\historicoPedidos;
 use App\Http\Controllers\Api\FavoritoController;
 use App\Http\Controllers\Api\BibliotecaController;
+use App\Http\Controllers\Api\EbookMarcacaoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +94,9 @@ Route::middleware('auth')->group(function(){
     Route::get('/pedidos/{pedido}', [historicoPedidos::class, 'show']);
     Route::get('/minha-biblioteca', [BibliotecaController::class, 'index']);
     Route::get('/biblioteca/livros/{livro}/leitura', [BibliotecaController::class, 'leitura']);
+    Route::get('/biblioteca/livros/{livro}/marcacoes', [EbookMarcacaoController::class, 'index']);
+    Route::post('/biblioteca/livros/{livro}/marcacoes', [EbookMarcacaoController::class, 'store']);
+    Route::delete('/biblioteca/marcacoes/{marcacao}', [EbookMarcacaoController::class, 'destroy']);
     
 
     //oprerações restritas à admin:

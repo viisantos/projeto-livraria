@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Livro;
+use App\Models\EbookMarcacao;
 use App\Models\Pedido;
 use App\Models\PedidoItems;
 use App\Models\User;
@@ -83,6 +84,91 @@ class BibliotecaTest extends TestCase
             );
     }
 
+    public function test_comprador_pode_salvar_e_listar_marcacoes_do_ebook(): void
+    {
+        $auth = $this->loginComoComprador();
+        $livro = Livro::factory()->create([
+            'arquivo_ebook' => 'ebooks/marcavel.pdf',
+            'formato_ebook' => 'pdf',
+        ]);
+        $this->criarPedidoComItem($auth['user'], $livro, Pedido::STATUS_PAGO);
+
+        $payload = [
+            'tipo' => EbookMarcacao::TIPO_DESTAQUE,
+            'pagina' => 7,
+            'texto' => 'Trecho importante do ebook',
+            'cor' => '#fff2a8',
+            'retangulos' => [
+                ['left' => 0.1, 'top' => 0.2, 'width' => 0.3, 'height' => 0.04],
+            ],
+        ];
+
+        $this->postJson(
+            "/api/biblioteca/livros/{$livro->id}/marcacoes",
+            $payload,
+            $this->headerComToken($auth['token'])
+        )
+            ->assertCreated()
+            ->assertJsonPath('data.tipo', EbookMarcacao::TIPO_DESTAQUE)
+            ->assertJsonPath('data.pagina', 7)
+            ->assertJsonPath('data.cor', '#fff2a8')
+            ->assertJsonPath('data.retangulos.0.left', 0.1);
+
+        $this->getJson(
+            "/api/biblioteca/livros/{$livro->id}/marcacoes",
+            $this->headerComToken($auth['token'])
+        )
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.texto', 'Trecho importante do ebook');
+    }
+
+    public function test_comprador_nao_pode_salvar_marcacao_em_ebook_que_nao_adquiriu(): void
+    {
+        $auth = $this->loginComoComprador();
+        $livro = Livro::factory()->create([
+            'arquivo_ebook' => 'ebooks/restrito.pdf',
+            'formato_ebook' => 'pdf',
+        ]);
+
+        $this->postJson(
+            "/api/biblioteca/livros/{$livro->id}/marcacoes",
+            [
+                'tipo' => EbookMarcacao::TIPO_MARCADOR,
+                'pagina' => 3,
+            ],
+            $this->headerComToken($auth['token'])
+        )->assertForbidden();
+    }
+
+    public function test_comprador_pode_remover_sua_marcacao(): void
+    {
+        $auth = $this->loginComoComprador();
+        $livro = Livro::factory()->create([
+            'arquivo_ebook' => 'ebooks/anotado.pdf',
+            'formato_ebook' => 'pdf',
+        ]);
+        $this->criarPedidoComItem($auth['user'], $livro, Pedido::STATUS_PAGO);
+
+        $marcacao = EbookMarcacao::create([
+            'user_id' => $auth['user']->id,
+            'livro_id' => $livro->id,
+            'tipo' => EbookMarcacao::TIPO_ANOTACAO,
+            'pagina' => 2,
+            'texto' => 'Minha nota',
+        ]);
+
+        $this->deleteJson(
+            "/api/biblioteca/marcacoes/{$marcacao->id}",
+            [],
+            $this->headerComToken($auth['token'])
+        )->assertOk();
+
+        $this->assertDatabaseMissing('ebook_marcacoes', [
+            'id' => $marcacao->id,
+        ]);
+    }
+
     private function criarPedidoComItem(User $user, Livro $livro, string $status): Pedido
     {
         $pedido = Pedido::create([
@@ -95,7 +181,6 @@ class BibliotecaTest extends TestCase
         PedidoItems::create([
             'pedido_id' => $pedido->id,
             'livro_id' => $livro->id,
-            'quantidade' => 1,
             'preco' => 49.90,
         ]);
 

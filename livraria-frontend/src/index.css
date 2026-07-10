@@ -83,3 +83,309 @@ html, body, #root {
 .navbar{
   min-height: 20%;
 }
+
+.ebook-reader {
+  width: 100vw;
+  height: calc(100vh - 76px);
+  min-height: 620px;
+  margin-left: calc(50% - 50vw);
+  margin-top: -1.5rem;
+  display: flex;
+  flex-direction: column;
+  color: #232323;
+  overflow: hidden;
+}
+
+.ebook-reader-claro {
+  background: #f4f1ea;
+}
+
+.ebook-reader-sepia {
+  background: #efe1c4;
+}
+
+.ebook-reader-escuro {
+  background: #171717;
+  color: #f4f1ea;
+}
+
+.ebook-reader-toolbar {
+  flex: 0 0 auto;
+  min-height: 64px;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  z-index: 20;
+}
+
+.ebook-reader-escuro .ebook-reader-toolbar {
+  background: rgba(31, 31, 31, 0.96);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ebook-reader-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ebook-page-input {
+  width: 150px;
+}
+
+.ebook-reader-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ebook-reader-stage {
+  min-width: 0;
+  min-height: 0;
+  padding: 1.5rem;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
+  cursor: grab;
+}
+
+.ebook-reader-stage-dragging,
+.ebook-reader-stage-dragging .ebook-pdf-page,
+.ebook-reader-stage-dragging .ebook-pdf-canvas,
+.ebook-reader-stage-dragging .ebook-pdf-text-layer,
+.ebook-reader-stage-dragging .ebook-pdf-text-layer span {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.ebook-reader-page,
+.ebook-reader-page-shell {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-bottom: 2rem;
+}
+
+.ebook-pdf-page {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+
+.ebook-reader-sepia .ebook-pdf-page {
+  background: #f6ebd0;
+  border-color: rgba(92, 68, 37, 0.2);
+}
+
+.ebook-reader-escuro .ebook-pdf-page {
+  background: #202020;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.ebook-pdf-canvas {
+  display: block;
+  position: relative;
+  z-index: 0;
+  cursor: grab;
+}
+
+.ebook-reader-sepia .ebook-pdf-canvas {
+  filter: sepia(0.55) saturate(0.82) brightness(1.03) contrast(0.94);
+}
+
+.ebook-reader-sepia .ebook-pdf-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(238, 207, 151, 0.28);
+  mix-blend-mode: multiply;
+}
+
+.ebook-reader-escuro .ebook-pdf-canvas {
+  filter: invert(0.9) hue-rotate(180deg) contrast(0.92);
+}
+
+.ebook-pdf-text-layer {
+  inset: 0;
+  z-index: 3;
+  cursor: grab;
+}
+
+.ebook-pdf-text-layer span {
+  cursor: text;
+}
+
+.ebook-reader-sepia .ebook-pdf-text-layer {
+  filter: sepia(0.45) saturate(0.8);
+}
+
+.ebook-reader-highlights {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ebook-reader-highlight {
+  position: absolute;
+  opacity: 0.48;
+  mix-blend-mode: multiply;
+  border-radius: 2px;
+}
+
+.ebook-reader-rendering {
+  position: absolute;
+  top: 86px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.ebook-reader-warning {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  max-width: min(560px, calc(100% - 2rem));
+}
+
+.ebook-reader-frame {
+  width: 100%;
+  height: calc(100vh - 132px);
+  min-height: 560px;
+  border: 0;
+  display: block;
+  background: #ffffff;
+}
+
+.ebook-reader-panel {
+  width: 360px;
+  max-width: 100vw;
+  min-height: 0;
+  padding: 1.25rem;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.ebook-reader-escuro .ebook-reader-panel {
+  background: #242424;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ebook-reader-escuro .ebook-reader-panel .btn-outline-dark {
+  color: #f4f1ea;
+  border-color: rgba(244, 241, 234, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ebook-reader-escuro .ebook-reader-panel .btn-outline-dark:hover,
+.ebook-reader-escuro .ebook-reader-panel .btn-outline-dark:focus {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.ebook-reader-escuro .ebook-reader-panel .btn-dark {
+  color: #171717;
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.ebook-highlight-color {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+}
+
+.ebook-highlight-color.active {
+  outline: 3px solid #212529;
+  outline-offset: 2px;
+}
+
+.ebook-note {
+  padding: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 5px solid #fff2a8;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.ebook-reader-escuro .ebook-note,
+.ebook-reader-escuro .ebook-reader-panel .bg-light {
+  background: #303030 !important;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f4f1ea;
+}
+
+.ebook-reader-escuro .text-muted {
+  color: #b8b8b8 !important;
+}
+
+.ebook-reader-escuro .ebook-note .text-dark {
+  color: #f4f1ea !important;
+}
+
+@media (max-width: 992px) {
+  .ebook-reader-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ebook-reader-panel {
+    width: 100%;
+    max-height: 42vh;
+    border-left: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (max-width: 576px) {
+  .ebook-reader {
+    height: calc(100vh - 64px);
+    min-height: 0;
+  }
+
+  .ebook-reader-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ebook-reader-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .ebook-page-input {
+    width: 100%;
+  }
+
+  .ebook-reader-stage {
+    padding: 0.75rem;
+  }
+}

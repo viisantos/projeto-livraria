@@ -14,7 +14,7 @@ return new class extends Migration
         DB::statement("
             SELECT setval(
                 pg_get_serial_sequence('autores', 'id'),
-                COALESCE((SELECT MAX(id) FROM autores), 1),
+                COALESCE((SELECT MAX(id) FRM autores), 1),
                 (SELECT COUNT(*) > 0 FROM autores)
             )
         ");
