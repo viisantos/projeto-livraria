@@ -51,7 +51,7 @@ export function Catalogo() {
 
   async function buscarCategorias(): Promise<void> {
     try {
-      const response = await api.get<PaginatedResponse<Categoria>>('/categorias', {
+      const response = await api.get<PaginatedResponse<Categoria>>('/catalogo/categorias', {
         params: { per_page: 100 }
       })
       setCategorias(response.data.data)
