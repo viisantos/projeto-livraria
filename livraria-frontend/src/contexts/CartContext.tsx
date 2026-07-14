@@ -3,7 +3,8 @@ import api from '../api/axios'
 import { useAuth } from '../hooks/useAuth'
 import type { Livro } from '../types'
 
-const CART_STORAGE_KEY = 'livraria:carrinho'
+const LEGACY_CART_STORAGE_KEY = 'livraria:carrinho'
+const USER_CART_STORAGE_PREFIX = 'livraria:carrinho:usuario'
 
 interface CartItem {
     livroId: number
@@ -36,9 +37,13 @@ function livroParaCartItem(livro: Livro): CartItem {
     }
 }
 
-function carregarCarrinhoLocal(): CartItem[] {
+function chaveCarrinhoUsuario(userId: number): string {
+    return `${USER_CART_STORAGE_PREFIX}:${userId}`
+}
+
+function carregarCarrinhoLocal(chave: string): CartItem[] {
     try {
-        const carrinhoSalvo = localStorage.getItem(CART_STORAGE_KEY)
+        const carrinhoSalvo = localStorage.getItem(chave)
         if (!carrinhoSalvo) return []
 
         const itens = JSON.parse(carrinhoSalvo) as CartItem[]
@@ -56,32 +61,45 @@ function aplicarRespostaCarrinho(response: CarrinhoResponse): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-    const { autenticado, token, loading } = useAuth()
-    const [cart, setCart] = useState<CartItem[]>(carregarCarrinhoLocal)
+    const { autenticado, token, loading, user } = useAuth()
+    const [cart, setCart] = useState<CartItem[]>([])
     const [sincronizando, setSincronizando] = useState(false)
     const cartRef = useRef(cart)
-    const tokenSincronizadoRef = useRef<string | null>(null)
+    const sincronizacaoRef = useRef<string | null>(null)
 
     useEffect(() => {
         cartRef.current = cart
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
-    }, [cart])
+
+        if (autenticado && user?.id) {
+            localStorage.setItem(chaveCarrinhoUsuario(user.id), JSON.stringify(cart))
+        }
+    }, [autenticado, cart, user?.id])
 
     useEffect(() => {
         if (loading) return
 
-        if (!autenticado || !token) {
-            tokenSincronizadoRef.current = null
+        localStorage.removeItem(LEGACY_CART_STORAGE_KEY)
+
+        if (!autenticado || !token || !user?.id) {
+            sincronizacaoRef.current = null
+            setCart([])
             return
         }
 
-        if (tokenSincronizadoRef.current === token) return
+        const chaveLocal = chaveCarrinhoUsuario(user.id)
+        const chaveSincronizacao = `${user.id}:${token}`
+
+        if (sincronizacaoRef.current === chaveSincronizacao) return
+
+        const carrinhoLocalDoUsuario = carregarCarrinhoLocal(chaveLocal)
+        setCart(carrinhoLocalDoUsuario)
+        cartRef.current = carrinhoLocalDoUsuario
 
         let cancelado = false
-        tokenSincronizadoRef.current = token
+        sincronizacaoRef.current = chaveSincronizacao
         setSincronizando(true)
 
-        api.post<CarrinhoResponse>('/me/carrinho/sincronizar', { livros: cartRef.current })
+        api.post<CarrinhoResponse>('/me/carrinho/sincronizar', { livros: carrinhoLocalDoUsuario })
             .then((response) => {
                 if (!cancelado) setCart(aplicarRespostaCarrinho(response.data))
             })
@@ -95,7 +113,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return () => {
             cancelado = true
         }
-    }, [autenticado, loading, token])
+    }, [autenticado, loading, token, user?.id])
 
     function addToCart(livro: Livro): void {
         setCart((atual) =>
