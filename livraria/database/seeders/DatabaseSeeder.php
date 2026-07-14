@@ -10,6 +10,7 @@ use Database\Seeders\AutorSeeder;
 use Database\Seeders\LivroUserSeeder;
 use Database\Seeders\CategoriaSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\LivrosCatalogoAtualSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AutorSeeder::class);
         $this->call(CategoriaSeeder::class);
         $this->call(LivroSeeder::class);
+        $this->call(LivrosCatalogoAtualSeeder::class);
         $this->call(LivroUserSeeder::class);
 
 

@@ -52,6 +52,11 @@ class Livro extends Model
             ->withTimestamps();
     }
 
+    public function emCarrinhos(){
+        return $this->belongsToMany(User::class, 'carrinho_itens')
+            ->withTimestamps();
+    }
+
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');

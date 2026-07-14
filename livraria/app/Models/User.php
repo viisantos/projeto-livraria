@@ -60,6 +60,11 @@ class User extends Authenticatable implements JWTSubject
             ->withTimestamps();
     }
 
+    public function carrinho(){
+        return $this->belongsToMany(Livro::class, 'carrinho_itens')
+            ->withTimestamps();
+    }
+
     public function getJWTIdentifier(){
         return $this->getKey();
     }

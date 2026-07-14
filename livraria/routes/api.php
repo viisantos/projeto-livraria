@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\historicoPedidos;
 use App\Http\Controllers\Api\FavoritoController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\EbookMarcacaoController;
+use App\Http\Controllers\Api\CarrinhoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,11 @@ Route::middleware('auth')->group(function(){
     Route::get('/livros/{livro}/favorito', [FavoritoController::class, 'show']);
     Route::post('/livros/{livro}/favoritar', [FavoritoController::class, 'store']);
     Route::delete('/livros/{livro}/favoritar', [FavoritoController::class, 'destroy']);
+    Route::get('/me/carrinho', [CarrinhoController::class, 'index']);
+    Route::post('/me/carrinho/sincronizar', [CarrinhoController::class, 'sync']);
+    Route::delete('/me/carrinho', [CarrinhoController::class, 'clear']);
+    Route::post('/livros/{livro}/carrinho', [CarrinhoController::class, 'store']);
+    Route::delete('/livros/{livro}/carrinho', [CarrinhoController::class, 'destroy']);
 
 
     Route::post('/payment/intent', [PagamentoController::class, 'intencaoPagamento']);
