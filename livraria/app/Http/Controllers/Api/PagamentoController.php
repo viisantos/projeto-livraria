@@ -53,14 +53,27 @@ class PagamentoController extends Controller
 
     public function confirmarPagamento(Request $request): JsonResponse
     {
-        $request->validate([
+        $dadosValidados = $request->validate([
             'payment_intent_id' => 'required|string',
+            'nome_no_cartao' => 'nullable|string|max:120',
+            'pais_cartao' => 'nullable|string|size:2',
+        ]);
+
+        Log::info('Confirmando pagamento com dados de cobranca', [
+            'user_id' => $request->user()->id,
+            'payment_intent_id' => $request->payment_intent_id,
+            'nome_no_cartao_informado' => $request->filled('nome_no_cartao'),
+            'pais_cartao' => $request->pais_cartao,
         ]);
 
         try {
             $resultado = $this->pagamentoService->confirmarPagamento(
                 $request->payment_intent_id,
-                $request->user()->id
+                $request->user()->id,
+                [
+                    'nome_no_cartao' => $dadosValidados['nome_no_cartao'] ?? null,
+                    'pais_cartao' => $dadosValidados['pais_cartao'] ?? null,
+                ]
             );
 
             $httpStatus = match ($resultado['status']) {

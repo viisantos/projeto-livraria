@@ -72,8 +72,15 @@ class PagamentoService{
         return $intent->client_secret;
     }
 
-    public function confirmarPagamento(string $paymentIntentId, int $userId): array
+    public function confirmarPagamento(string $paymentIntentId, int $userId, array $dadosCobranca = []): array
     {
+        Log::info('Dados de cobranca recebidos para confirmacao de pagamento', [
+            'user_id' => $userId,
+            'payment_intent_id' => $paymentIntentId,
+            'nome_no_cartao_informado' => !empty($dadosCobranca['nome_no_cartao']),
+            'pais_cartao' => $dadosCobranca['pais_cartao'] ?? null,
+        ]);
+
         try {
             $intent = PaymentIntent::retrieve($paymentIntentId);
         } catch (ApiErrorException $e){
