@@ -44,6 +44,9 @@ export function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-link" to="/admin/usuarios"> Usuarios </Link>
                             </li>
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/admin/analytics"> Analytics </Link>
+                            </li>
                         </>
                     )}
                 </ul>

@@ -21,6 +21,7 @@ import { EditarUsuario } from './pages/Admin/EditarUsuario'
 import Autores from './pages/Admin/Autores'
 import { NovoAutor }  from './pages/Admin/NovoAutor'
 import { EditarAutor } from './pages/Admin/EditarAutor'
+import { Analytics } from './pages/Admin/Analytics'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { CheckoutSucesso } from './pages/CheckoutSucesso'
 import { Carrinho } from './pages/Carrinho'
@@ -178,6 +179,10 @@ function App() {
                     }/>
                     <Route path="/admin/usuarios/:id/editar" element={
                         <AdminRoute><EditarUsuario/></AdminRoute>
+                    }/>
+
+                    <Route path="/admin/analytics" element={
+                      <AdminRoute><Analytics /></AdminRoute>
                     }/>                    
                                       
                     {/* Redireciona para rota raiz caso a pessoa vá para '/*/ } 

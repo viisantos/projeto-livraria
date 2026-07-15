@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\FavoritoController;
 use App\Http\Controllers\Api\BibliotecaController;
 use App\Http\Controllers\Api\EbookMarcacaoController;
 use App\Http\Controllers\Api\CarrinhoController;
+use App\Http\Controllers\Api\AnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,7 @@ Route::middleware('auth')->group(function(){
 
     //comprador e admin, ambos podem visuaizar catálogo
     Route::get('/catalogo', [LivroController::class, 'catalogo']);
+    Route::get('/catalogo/categorias', [CategoriaController::class, 'catalogo']);
     Route::get('/catalogo/livros/{livro:slug}', [LivroController::class, 'show']);
     Route::get('/livros', [LivroController::class, 'index']);
     Route::get('/livros/{livro}', [LivroController::class, 'show']);
@@ -107,6 +109,9 @@ Route::middleware('auth')->group(function(){
 
     //oprerações restritas à admin:
     Route::middleware('role:admin')->group(function(){
+        Route::get('/admin/analytics', [AnalyticsController::class, 'dashboard']);
+        Route::get('/admin/analytics/exportar/pedidos', [AnalyticsController::class, 'exportarPedidos']);
+        Route::get('/admin/analytics/exportar/itens', [AnalyticsController::class, 'exportarItens']);
         Route::post('/livros', [LivroController::class, 'store']);
         Route::put('/livros/{livro}', [LivroController::class, 'update']);
         Route::delete('/livros/{livro}', [LivroController::class, 'destroy']);
