@@ -30,6 +30,7 @@ class LivroFactory extends Factory
         'publicacao' => fake()->date(),
         'imagem_capa' => fake()->imageUrl(),
         'sobre' => $this->faker->paragraphs(3, true),
+        'preco' => fake()->randomFloat(2, 9, 199),
     ];
     }
 }

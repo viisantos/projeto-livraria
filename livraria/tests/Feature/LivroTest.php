@@ -13,17 +13,6 @@ use App\Models\Livro;
 
 class LivroTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    /*
-    public function test_example(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }*/
-
     private function dadosLivro(int $autorId, int $categoriaId): array {
         return [
             'titulo'         => 'Introdução ao desenvolvimento web volume 2',
@@ -37,7 +26,6 @@ class LivroTest extends TestCase
             'autor_id'       => $autorId,
             'categoria_id'   => $categoriaId,
             'preco'          => 59.90,
-            'estoque'        => 10,
         ];
     }
 
@@ -90,25 +78,22 @@ class LivroTest extends TestCase
             'titulo' => 'Codigo Limpo',
             'descricao' => 'Boas praticas de desenvolvimento',
             'preco' => 89.90,
-            'estoque' => 8,
         ]);
 
         Livro::factory()->create([
             'categoria_id' => $categoriaRomance->id,
-            'titulo' => 'Romance Sem Estoque',
+            'titulo' => 'Romance fora do filtro',
             'preco' => 49.90,
-            'estoque' => 0,
         ]);
 
         Livro::factory()->create([
             'categoria_id' => $categoriaTecnologia->id,
             'titulo' => 'Livro Muito Caro',
             'preco' => 180.00,
-            'estoque' => 5,
         ]);
 
         $response = $this->getJson(
-            '/api/catalogo?busca=Codigo&categoria=tecnologia&min_preco=50&max_preco=100&disponivel=1',
+            '/api/catalogo?busca=Codigo&categoria=tecnologia&min_preco=50&max_preco=100',
             $this->headerComToken($auth['token'])
         );
 
@@ -124,12 +109,10 @@ class LivroTest extends TestCase
         $livroCaro = Livro::factory()->create([
             'titulo' => 'Livro Caro',
             'preco' => 120.00,
-            'estoque' => 3,
         ]);
         $livroBarato = Livro::factory()->create([
             'titulo' => 'Livro Barato',
             'preco' => 25.00,
-            'estoque' => 4,
         ]);
 
         $response = $this->getJson(
@@ -223,7 +206,6 @@ class LivroTest extends TestCase
             'imagem_capa' => 'https://example.com/codigo-limpo.png',
             'sobre' => 'Um guia para escrever software melhor.',
             'preco' => 89.90,
-            'estoque' => 8,
         ]);
 
         $response = $this->getJson(
@@ -244,7 +226,7 @@ class LivroTest extends TestCase
             ->assertJsonPath('autor.nome', 'Robert Martin')
             ->assertJsonPath('categoria.id', $categoria->id)
             ->assertJsonPath('categoria.nome', 'Programação')
-            ->assertJsonPath('estoque', 8);
+            ->assertJsonMissingPath('estoque');
     }
 
     public function test_admin_pode_criar_livro(){

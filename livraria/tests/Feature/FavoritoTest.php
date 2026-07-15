@@ -62,10 +62,11 @@ class FavoritoTest extends TestCase
             ->assertJsonPath('meta.total', 2)
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'titulo', 'autor', 'categoria', 'preco', 'estoque'],
+                    '*' => ['id', 'titulo', 'autor', 'categoria', 'preco'],
                 ],
                 'meta' => ['total', 'por_pagina', 'pagina_atual', 'ultima_pagina'],
-            ]);
+            ])
+            ->assertJsonMissingPath('data.0.estoque');
     }
 
     public function test_comprador_pode_verificar_se_livro_esta_favoritado(): void

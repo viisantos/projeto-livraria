@@ -23,6 +23,16 @@ class CategoriaController extends Controller
         return response()->json(new CategoriaCollection($categorias));
     }
 
+    public function catalogo(Request $request): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 100);
+        $perPage = max(1, min($perPage, 100));
+
+        $categorias = Categoria::orderBy('nome')->paginate($perPage);
+
+        return response()->json(new CategoriaCollection($categorias));
+    }
+
     public function store(StoreCategoriaRequest $categoriaRequest){
         //Gate::authorize('create', Categoria::class);
         $categoria = $this->categoriaService->criar($categoriaRequest->validated());

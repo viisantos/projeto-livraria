@@ -50,7 +50,7 @@ class UserTest extends TestCase
         );
 
         $response->assertStatus(200)
-            ->assertJsonFragment(['nome' => 'Nome Atualizado']);
+            ->assertJsonFragment(['name' => 'Nome Atualizado']);
     }
 
     // --- DELETAR A SI MESMO ---

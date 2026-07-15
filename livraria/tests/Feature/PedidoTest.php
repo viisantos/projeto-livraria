@@ -27,7 +27,6 @@ class PedidoTest extends TestCase
         PedidoItems::create([
             'pedido_id' => $pedido->id,
             'livro_id' => $livro->id,
-            'quantidade' => 2,
             'preco' => 89.90,
         ]);
 
@@ -42,7 +41,9 @@ class PedidoTest extends TestCase
             ->assertJsonPath('itens.0.livro_id', $livro->id)
             ->assertJsonPath('itens.0.titulo', 'Codigo Limpo')
             ->assertJsonPath('itens.0.imagem_capa', 'https://example.com/codigo-limpo.png')
-            ->assertJsonPath('itens.0.quantidade', 2);
+            ->assertJsonPath('itens.0.preco', 89.90)
+            ->assertJsonPath('itens.0.subtotal', 89.90)
+            ->assertJsonMissingPath('itens.0.quantidade');
     }
 
     public function test_comprador_nao_pode_visualizar_pedido_de_outro_usuario(): void

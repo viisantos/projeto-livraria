@@ -111,7 +111,7 @@ class CategoriaTest extends TestCase
         ]);
     }
 
-    public function test_slug_e_gerado_automaticamente_quando_omitido(): void
+    public function test_criacao_falha_quando_slug_e_omitido(): void
     {
         $auth = $this->loginComoAdmin();
 
@@ -121,12 +121,8 @@ class CategoriaTest extends TestCase
             $this->headerComToken($auth['token'])
         );
 
-        $response->assertStatus(201)
-            ->assertJsonFragment(['slug' => 'programacao-web']);
-
-        $this->assertDatabaseHas('categorias', [
-            'slug' => 'programacao-web',
-        ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
     }
 
     public function test_comprador_nao_pode_criar_categoria(): void

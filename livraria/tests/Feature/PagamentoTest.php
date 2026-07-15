@@ -28,7 +28,6 @@ class PagamentoTest extends TestCase
                     [
                         'livroId' => 1,
                         'price' => 59.9,
-                        'quantidade' => 1,
                     ],
                 ],
             ],

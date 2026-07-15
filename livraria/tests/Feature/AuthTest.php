@@ -10,17 +10,6 @@ use App\Models\User;
 
 class AuthTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    /*
-    public function test_example(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }*/
-
     public function test_usuario_pode_se_registrar(): void {
         $response = $this->postJson('/api/register', [
             'name'     => 'Maria Silva',
@@ -31,9 +20,11 @@ class AuthTest extends TestCase
 
         $response->assertStatus(201)
                  ->assertJsonStructure([
-                    'status',
-                    'user' => ['id', 'nome', 'email'],
-                    'authorisation' => ['token', 'type'],
+                    'id',
+                    'name',
+                    'email',
+                    'perfil',
+                    'criado_em',
                  ]);
         $this->assertDatabaseHas('users', ['email' => 'maria@email.com']);
     }
@@ -58,10 +49,11 @@ class AuthTest extends TestCase
     }
 
     public function test_usuario_pode_fazer_login(): void{
-        User::factory()->create([
+        $usuario = User::factory()->create([
             'email' => 'maria@email.com',
-            'password' => bcrypt('12345678')
+            'password' => '12345678'
         ]);
+        $usuario->assignRole('comprador');
 
         $response = $this->postJson('/api/login', [
             'email' => 'maria@email.com',

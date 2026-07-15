@@ -4,6 +4,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 abstract class TestCase extends BaseTestCase {
     use RefreshDatabase;
@@ -11,7 +12,8 @@ abstract class TestCase extends BaseTestCase {
     protected function loginComoAdmin(): array {
         $admin = User::factory()->create();
         $admin->assignRole('admin');
-        $token = auth('api')->login($admin);
+        $this->app['auth']->forgetGuards();
+        $token = JWTAuth::fromUser($admin);
 
         return ['user' => $admin, 'token' => $token];
     }
@@ -19,11 +21,14 @@ abstract class TestCase extends BaseTestCase {
     protected function loginComoComprador(): array {
         $comprador = User::factory()->create();
         $comprador->assignRole('comprador');
-        $token = auth('api')->login($comprador);
+        $this->app['auth']->forgetGuards();
+        $token = JWTAuth::fromUser($comprador);
         return ['user' => $comprador, 'token' => $token];
     }
 
     protected function headerComToken(string $token): array {
+        $this->app['auth']->forgetGuards();
+
         return [
             'Authorization' => "Bearer {$token}",
             'Accept'        => 'application/json'

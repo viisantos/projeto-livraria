@@ -116,6 +116,36 @@ class CarrinhoTest extends TestCase
         ]);
     }
 
+    public function test_carrinho_persistido_e_isolado_por_usuario(): void
+    {
+        $primeiroComprador = $this->loginComoComprador();
+        $segundoComprador = $this->loginComoComprador();
+        $livroDoPrimeiro = Livro::factory()->create(['preco' => 20]);
+        $livroDoSegundo = Livro::factory()->create(['preco' => 35]);
+
+        $this->actingAs($primeiroComprador['user'], 'api')->postJson(
+            "/api/livros/{$livroDoPrimeiro->id}/carrinho",
+            []
+        )->assertStatus(201);
+
+        $this->actingAs($segundoComprador['user'], 'api')->postJson(
+            "/api/livros/{$livroDoSegundo->id}/carrinho",
+            []
+        )->assertStatus(201);
+
+        $this->actingAs($primeiroComprador['user'], 'api')->getJson('/api/me/carrinho')
+            ->assertStatus(200)
+            ->assertJsonPath('total_itens', 1)
+            ->assertJsonPath('data.0.id', $livroDoPrimeiro->id)
+            ->assertJsonMissing(['id' => $livroDoSegundo->id]);
+
+        $this->actingAs($segundoComprador['user'], 'api')->getJson('/api/me/carrinho')
+            ->assertStatus(200)
+            ->assertJsonPath('total_itens', 1)
+            ->assertJsonPath('data.0.id', $livroDoSegundo->id)
+            ->assertJsonMissing(['id' => $livroDoPrimeiro->id]);
+    }
+
     public function test_comprador_pode_limpar_carrinho(): void
     {
         $auth = $this->loginComoComprador();

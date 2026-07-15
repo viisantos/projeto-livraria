@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateCategoriaRequest extends FormRequest
 {
@@ -23,7 +24,11 @@ class UpdateCategoriaRequest extends FormRequest
     {
         return [
              'nome' => 'sometimes|string',
-             'slug' => 'sometimes|string',
+             'slug' => [
+                 'sometimes',
+                 'string',
+                 Rule::unique('categorias', 'slug')->ignore($this->route('categoria')),
+             ],
         ];
     }
 }
