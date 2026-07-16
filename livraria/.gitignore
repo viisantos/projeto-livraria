@@ -20,3 +20,11 @@ yarn-error.log
 /.vscode
 /.ze
 .history/
+
+# Project scratch files and local database dumps
+/app/contexts/
+/app/Http/Controllers/Api/rascunho.txt
+/*.sql
+/'ok'])
+/group(function
+/compradores
